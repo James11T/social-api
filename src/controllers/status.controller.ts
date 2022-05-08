@@ -1,5 +1,5 @@
 import express from "express";
-import type { pingSchemaType } from "../validation/status";
+import type { pingSchemaType } from "../validation/status.validation";
 
 /**
  * Responds with pong if API is alive
