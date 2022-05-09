@@ -1,6 +1,6 @@
 import { clamp } from "../../../src/utils/math";
 
-describe("clamp", () => {
+describe("clamp function", () => {
   it("should clamp up to min", () => {
     expect(clamp(-5, 0, 10)).toBe(0);
     expect(clamp(Number.MIN_SAFE_INTEGER, 0, 10)).toBe(0);
