@@ -6,7 +6,9 @@ import type { Request, Response } from "express";
  * @param req Express request object
  * @param res Express response object
  */
-const signInController = (req: Request, res: Response) => {}; // POST
+const signInController = (req: Request, res: Response) => {
+  // TODO: Implement
+}; // POST
 
 /**
  * Create a new user from the request body
@@ -14,7 +16,9 @@ const signInController = (req: Request, res: Response) => {}; // POST
  * @param req Express request object
  * @param res Express response object
  */
-const signUpController = (req: Request, res: Response) => {}; // POST
+const signUpController = (req: Request, res: Response) => {
+  // TODO: Implement
+}; // POST
 
 /**
  * Clear the authentication cookie
@@ -22,7 +26,9 @@ const signUpController = (req: Request, res: Response) => {}; // POST
  * @param req Express request object
  * @param res Express response object
  */
-const deauthController = (req: Request, res: Response) => {}; // GET
+const deauthController = (req: Request, res: Response) => {
+  // TODO: Implement
+}; // GET
 
 /**
  * Trigger a password reset
@@ -30,7 +36,9 @@ const deauthController = (req: Request, res: Response) => {}; // GET
  * @param req Express request object
  * @param res Express response object
  */
-const forgotPasswordController = (req: Request, res: Response) => {}; // GET
+const forgotPasswordController = (req: Request, res: Response) => {
+  // TODO: Implement
+}; // GET
 
 export {
   signInController,

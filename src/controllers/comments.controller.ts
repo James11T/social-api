@@ -1,12 +1,34 @@
 import type { Request, Response } from "express";
 
 /**
+ * Filter comments by search query
+ *
+ * @param req Express request object
+ * @param res Express response object
+ */
+const queryCommentController = (req: Request, res: Response) => {
+  // TODO: Implement
+}; // GET
+
+/**
+ * Create a comment from the request body
+ *
+ * @param req Express request object
+ * @param res Express response object
+ */
+const createCommentController = (req: Request, res: Response) => {
+  // TODO: Implement
+}; // POST
+
+/**
  * Get a comment by ID
  *
  * @param req Express request object
  * @param res Express response object
  */
-const getCommentController = (req: Request, res: Response) => {}; // GET
+const getCommentController = (req: Request, res: Response) => {
+  // TODO: Implement
+}; // GET
 
 /**
  * Delete a comment by ID
@@ -14,7 +36,9 @@ const getCommentController = (req: Request, res: Response) => {}; // GET
  * @param req Express request object
  * @param res Express response object
  */
-const deleteCommentController = (req: Request, res: Response) => {}; // DELETE
+const deleteCommentController = (req: Request, res: Response) => {
+  // TODO: Implement
+}; // DELETE
 
 /**
  * Update a comment by ID
@@ -22,6 +46,14 @@ const deleteCommentController = (req: Request, res: Response) => {}; // DELETE
  * @param req Express request object
  * @param res Express response object
  */
-const editCommentController = (req: Request, res: Response) => {}; // PATCH
+const editCommentController = (req: Request, res: Response) => {
+  // TODO: Implement
+}; // PATCH
 
-export { getCommentController, deleteCommentController, editCommentController };
+export {
+  queryCommentController,
+  createCommentController,
+  getCommentController,
+  deleteCommentController,
+  editCommentController
+};

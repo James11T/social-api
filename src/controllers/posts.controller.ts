@@ -1,6 +1,14 @@
 import type { Request, Response } from "express";
 
-// POSTS
+/**
+ * Filter posts by search query
+ *
+ * @param req Express request object
+ * @param res Express response object
+ */
+const queryPostsController = (req: Request, res: Response) => {
+  // TODO: Implement
+}; // GET
 
 /**
  * Create a post from the request body
@@ -8,7 +16,9 @@ import type { Request, Response } from "express";
  * @param req Express request object
  * @param res Express response object
  */
-const createPostController = (req: Request, res: Response) => {}; // POST
+const createPostController = (req: Request, res: Response) => {
+  // TODO: Implement
+}; // POST
 
 /**
  * Get a post by ID
@@ -16,7 +26,9 @@ const createPostController = (req: Request, res: Response) => {}; // POST
  * @param req Express request object
  * @param res Express response object
  */
-const getPostController = (req: Request, res: Response) => {}; // GET
+const getPostController = (req: Request, res: Response) => {
+  // TODO: Implement
+}; // GET
 
 /**
  * Delete a post by ID
@@ -24,7 +36,9 @@ const getPostController = (req: Request, res: Response) => {}; // GET
  * @param req Express request object
  * @param res Express response object
  */
-const deletePostController = (req: Request, res: Response) => {}; // DELETE
+const deletePostController = (req: Request, res: Response) => {
+  // TODO: Implement
+}; // DELETE
 
 /**
  * Edit a post by ID based off the request body
@@ -32,80 +46,14 @@ const deletePostController = (req: Request, res: Response) => {}; // DELETE
  * @param req Express request object
  * @param res Express response object
  */
-const editPostController = (req: Request, res: Response) => {}; // PATCH
-
-// COMMENTS
-
-/**
- * Get comments on a post by post ID
- *
- * @param req Express request object
- * @param res Express response object
- */
-const getPostComments = (req: Request, res: Response) => {}; // GET
-
-/**
- * Create a comments on a post by post ID and reuqest body
- *
- * @param req Express request object
- * @param res Express response object
- */
-const createCommentController = (req: Request, res: Response) => {}; // POST
-
-// LIKES
-
-/**
- * Check if a given post is liked by the current user
- *
- * @param req Express request object
- * @param res Express response object
- */
-const isPostLikedController = (req: Request, res: Response) => {}; // GET
-
-/**
- * Like a post as the current user based on the post ID
- *
- * @param req Express request object
- * @param res Express response object
- */
-const likePostController = (req: Request, res: Response) => {}; // POST
-
-/**
- * Unlike a post as the current user based on the post ID
- *
- * @param req Express request object
- * @param res Express response object
- */
-const unlikePostController = (req: Request, res: Response) => {}; // DELETE
-
-/**
- * Count how many likes there are on a given post by post ID
- *
- * @param req Express request object
- * @param res Express response object
- */
-const getLikeCountController = (req: Request, res: Response) => {}; // GET
-
-// SEARCH
-
-/**
- * Filter posts by search query
- *
- * @param req Express request object
- * @param res Express response object
- */
-const searchPostsController = (req: Request, res: Response) => {}; // GET
+const editPostController = (req: Request, res: Response) => {
+  // TODO: Implement
+}; // PATCH
 
 export {
+  queryPostsController,
   createPostController,
   getPostController,
   deletePostController,
-  editPostController,
-  getPostComments,
-  createCommentController,
-  isPostLikedController,
-  likePostController,
-  unlikePostController,
-  getLikeCountController,
-  searchPostsController
+  editPostController
 };

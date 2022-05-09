@@ -6,7 +6,9 @@ import type { Request, Response } from "express";
  * @param req Express request object
  * @param res Express response object
  */
-const filterUserController = (req: Request, res: Response) => {}; // GET
+const filterUserController = (req: Request, res: Response) => {
+  // TODO: Implement
+}; // GET
 
 /**
  * Get a user from their ID
@@ -14,7 +16,9 @@ const filterUserController = (req: Request, res: Response) => {}; // GET
  * @param req Express request object
  * @param res Express response object
  */
-const getUserController = (req: Request, res: Response) => {}; // GET
+const getUserController = (req: Request, res: Response) => {
+  // TODO: Implement
+}; // GET
 
 /**
  * Get all friend requests for a user
@@ -22,7 +26,9 @@ const getUserController = (req: Request, res: Response) => {}; // GET
  * @param req Express request object
  * @param res Express response object
  */
-const getFriendRequestController = (req: Request, res: Response) => {}; // GET
+const getFriendRequestController = (req: Request, res: Response) => {
+  // TODO: Implement
+}; // GET
 
 /**
  * Send a friend request to the specified user as the currently authenticated user
@@ -30,7 +36,9 @@ const getFriendRequestController = (req: Request, res: Response) => {}; // GET
  * @param req Express request object
  * @param res Express response object
  */
-const sendFriendRequestController = (req: Request, res: Response) => {}; // POST
+const sendFriendRequestController = (req: Request, res: Response) => {
+  // TODO: Implement
+}; // POST
 
 /**
  * Get all friends for a user
@@ -38,7 +46,9 @@ const sendFriendRequestController = (req: Request, res: Response) => {}; // POST
  * @param req Express request object
  * @param res Express response object
  */
-const getUserFriendsController = (req: Request, res: Response) => {}; // GET
+const getUserFriendsController = (req: Request, res: Response) => {
+  // TODO: Implement
+}; // GET
 
 export {
   filterUserController,
