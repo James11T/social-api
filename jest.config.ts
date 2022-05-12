@@ -10,7 +10,8 @@ const config: Config.InitialOptions = {
     "ts-jest": {
       isolatedModules: true
     }
-  }
+  },
+  forceExit: true
 };
 
 export default config;
