@@ -1,6 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 import type { Document } from "mongoose";
-import { validateEmail } from "../utils/validation";
+import { validateEmail } from "../validation/data";
 
 interface FriendType {
   userId: string;
@@ -26,7 +26,7 @@ interface UserType extends Document {
   about?: string;
   email: string;
   passwordHash: string;
-  opt?: {
+  otp?: {
     status?: "disabled" | "pending" | "enabled";
     secret?: string;
     enabledAt?: Date;
@@ -80,7 +80,7 @@ const userSchema = new Schema<UserType>({
       }
     }
   ],
-  opt: {
+  otp: {
     status: {
       type: String,
       required: true,
