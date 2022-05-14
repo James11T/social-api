@@ -20,7 +20,7 @@ interface TokenType {
   };
 }
 
-interface UserType extends Document {
+interface UserType {
   userId: string;
   avatar?: string;
   about?: string;
@@ -89,7 +89,7 @@ const userSchema = new Schema<UserType>({
     },
     secret: {
       type: String,
-      required: true,
+      required: false,
       default: ""
     },
     enabledAt: {

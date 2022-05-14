@@ -1,3 +1,4 @@
+import { HydratedDocument } from "mongoose";
 import { UserType } from "./schemas/user.schema";
 
 declare global {
@@ -6,7 +7,7 @@ declare global {
       realIp: string;
     }
 
-    interface User extends UserType {}
+    interface User extends HydratedDocument<UserType> {}
   }
 }
 

@@ -1,3 +1,4 @@
+import { HydratedDocument } from "mongoose";
 import { userModel, UserType } from "../schemas/user.schema";
 import type { Request, Response, NextFunction } from "express";
 
@@ -21,7 +22,7 @@ const developmentAuthentication = async (
 
   if (!userId) return next();
 
-  let user: UserType;
+  let user: HydratedDocument<UserType>;
   try {
     user = await userModel.findOne({ userId });
   } catch (err) {
