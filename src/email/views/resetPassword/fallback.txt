@@ -1,0 +1,20 @@
+Hello {{name}}!
+
+We just received a request to change your password on Kakapo.
+If you didn't make this request, you can safely ignore this email and your password wont be changed but keep in mind that someone requested to change your password.
+
+If you did make the request, please continue by visiting the link below:
+
+{{link}}
+
+--------------------------------------------------
+
+If you want to know why you are receiving this email you can visit:
+https://kakaposocial.com/email/why
+
+If you would like to stop receiving emails you can unsubscribe here:
+https://kakaposocial.com/email/unsubscribe
+
+--------------------------------------------------
+
+This is the plain text version of this email, we always include stylised versions of our emails so if you would prefer to see that you might have to edit your email clients preferences.

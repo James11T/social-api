@@ -1,0 +1,28 @@
+Hello {{name}}!
+
+Thank you for choosing Kakapo, before you get started we just need to confirm that you own this email.
+
+To confirm your email please visit the link below:
+
+{{link}}
+
+--------------------------------------------------
+
+If you didn't create an account with us recently then you can safely ignore this email, it is likely that someone had a typo when entering their own email.
+You shouldn't receive any other emails from us unless your email is used on our platform again.
+
+If you wish to backlist yourself from our email systems please visit this link:
+
+{{blacklistLink}}
+
+--------------------------------------------------
+
+If you want to know why you are receiving this email you can visit:
+https://kakaposocial.com/email/why
+
+If you would like to stop receiving emails you can unsubscribe here:
+https://kakaposocial.com/email/unsubscribe
+
+--------------------------------------------------
+
+This is the plain text version of this email, we always include stylised versions of our emails so if you would prefer to see that you might have to edit your email clients preferences.
