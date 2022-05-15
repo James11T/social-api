@@ -3,16 +3,43 @@ import handlebars, { TemplateDelegate } from "handlebars";
 import { stripFileExtention } from "../utils/strings";
 import type { Attachment } from "nodemailer/lib/mailer";
 
+const NO_FALLBACK =
+  "This email is HTML only. If you can't see the HTML version of this email then you may need to update your email client preferences.";
+
 const TEMPLATE_DIR = "src/email/views/";
 
 interface APITemplate {
   render: TemplateDelegate;
+  fallback: TemplateDelegate;
   assets: Attachment[];
 }
 
 interface Templates {
   [key: string]: APITemplate;
 }
+
+/**
+ * Load the text fallback for a HTML email template
+ * If one does not exist then return the default fallback
+ *
+ * @param dirName Template directory name
+ * @returns Fallback template function
+ */
+const loadFallback = (dirName: string) => {
+  let fallback: string;
+  try {
+    fallback = fs.readFileSync(
+      `${TEMPLATE_DIR}${dirName}/fallback.txt`,
+      "utf8"
+    );
+  } catch (error) {
+    fallback = NO_FALLBACK;
+  }
+
+  return handlebars.compile(fallback);
+
+  // TODO: Test
+};
 
 /**
  *  Load a template directory from disk
@@ -27,6 +54,7 @@ const loadTemplate = (dirName: string): APITemplate => {
   );
 
   const render = handlebars.compile(template);
+  const fallback = loadFallback(dirName);
 
   const assets = fs.readdirSync(`${TEMPLATE_DIR}${dirName}/static`).map(
     (file): Attachment => ({
@@ -35,7 +63,10 @@ const loadTemplate = (dirName: string): APITemplate => {
       cid: stripFileExtention(file)
     })
   );
-  return { render, assets };
+
+  return { render, fallback, assets };
+
+  // TODO: Test
 };
 
 /**
@@ -62,8 +93,15 @@ const loadTemplates = () => {
   });
 
   return templates;
+
+  // TODO: Test
 };
 
 const templates = loadTemplates();
 
 export default templates;
+
+// LATO and Raleway
+
+// CID to FILE: /"cid:(.+?)"/ -> "static/$1.png"
+// FILE to CID: static\/(.+?)\.png -> "cid:$1"

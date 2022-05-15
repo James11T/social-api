@@ -1,8 +1,8 @@
 import "dotenv/config";
 import nodemailer from "nodemailer";
-import type { Attachment } from "nodemailer/lib/mailer";
 import aws from "aws-sdk";
 import templates from "./templates";
+import type { Attachment } from "nodemailer/lib/mailer";
 
 const {
   AWS_SES_ACCESS_KEY_ID,
@@ -60,6 +60,8 @@ const sendEmail = async (to: string | string[], options: EmailOptions) => {
     html: options.html,
     attachments: options.attachments
   });
+
+  // TODO: Test
 };
 
 /**
@@ -76,13 +78,18 @@ const sendTemplate = async (
   templateContext: any,
   options: EmailOptions
 ) => {
-  const html = templates[template].render(templateContext);
+  const loadedTemplate = templates[template];
+  const html = loadedTemplate.render(templateContext);
+  const text = loadedTemplate.fallback(templateContext);
 
   await sendEmail(to, {
     ...options,
     html,
+    text,
     attachments: templates[template].assets
   });
+
+  // TODO: Test
 };
 
 export { sendEmail, sendTemplate };
