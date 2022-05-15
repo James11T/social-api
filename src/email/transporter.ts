@@ -1,4 +1,3 @@
-import "dotenv/config";
 import nodemailer from "nodemailer";
 import aws from "aws-sdk";
 import templates from "./templates";
