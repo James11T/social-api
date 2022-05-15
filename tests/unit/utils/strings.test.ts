@@ -1,4 +1,7 @@
-import { countOccurrences } from "../../../src/utils/strings";
+import {
+  countOccurrences,
+  stripFileExtention
+} from "../../../src/utils/strings";
 
 describe("count occurrences", () => {
   it("should find 1 occurence", () => {
@@ -36,5 +39,27 @@ describe("count occurrences", () => {
     const str = "127.0.0.1,192.168.0.1";
     const result = countOccurrences(str, ipRegex);
     expect(result).toBe(2);
+  });
+});
+
+describe("strip file extention", () => {
+  it("should strip single file extention", () => {
+    const result = stripFileExtention("test.txt");
+    expect(result).toBe("test");
+  });
+
+  it("should return the same string if no extention", () => {
+    const result = stripFileExtention("test");
+    expect(result).toBe("test");
+  });
+
+  it("should strip double file extention correctly", () => {
+    const result = stripFileExtention("test.txt.txt");
+    expect(result).toBe("test.txt");
+  });
+
+  it("should strip . file correctly", () => {
+    const result = stripFileExtention(".env");
+    expect(result).toBe(".env");
   });
 });
