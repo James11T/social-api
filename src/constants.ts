@@ -23,3 +23,10 @@ export const PASSWORD_CONSTANTS: PasswordRequirements = {
   mustVaryCase: false,
   nonSpecialCharacters: /[a-zA-Z0-9 ]/g
 };
+
+export const USER_ID_CONSTANTS = {
+  minUserIdLength: 3,
+  maxUserIdLength: 32,
+  allowedChars: /[a-zA-Z0-9-_.]/g,
+  matchRegex: /^(?=.{3,32}$)(?![_.-])(?!.*[_.-]{2})[a-zA-Z0-9._-]+([^._\s-])$/
+};

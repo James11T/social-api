@@ -1,5 +1,9 @@
 import isEmail from "validator/lib/isEmail";
-import { PasswordRequirements, PASSWORD_CONSTANTS } from "../constants";
+import {
+  PasswordRequirements,
+  PASSWORD_CONSTANTS,
+  USER_ID_CONSTANTS
+} from "../constants";
 
 /**
  * Check if a email is in valid format
@@ -43,4 +47,15 @@ const validatePassword = (
   return metrics.reduce((prev, curr) => prev && curr, true);
 };
 
-export { validateEmail, validatePassword };
+/**
+ * Check a user id is valid
+ *
+ * @param userId A user id to validate
+ * @returns True if the user id is valid
+ */
+const validateUserId = (userId: string) => {
+  return userId.match(USER_ID_CONSTANTS.matchRegex) !== null;
+  // TODO: Test
+};
+
+export { validateEmail, validatePassword, validateUserId };
