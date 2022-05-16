@@ -6,7 +6,7 @@ import type { Attachment } from "nodemailer/lib/mailer";
 const NO_FALLBACK =
   "This email is HTML only. If you can't see the HTML version of this email then you may need to update your email client preferences.";
 
-const TEMPLATE_DIR = "src/email/views/";
+const TEMPLATE_DIR = "src/views/";
 
 interface APITemplate {
   render: TemplateDelegate;
