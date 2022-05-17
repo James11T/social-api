@@ -44,7 +44,9 @@ const validatePassword = (
     metrics.push(upperCase > 0 && lowerCase > 0);
   }
 
-  return metrics.reduce((prev, curr) => prev && curr, true);
+  const isValid = metrics.every((metric) => metric);
+
+  return isValid;
 };
 
 /**
