@@ -1,5 +1,7 @@
 import { argon2id } from "argon2";
 
+const { NODE_ENV } = process.env;
+
 export interface PasswordRequirements {
   minPasswordLength?: number;
   maxPasswordLength?: number;
@@ -29,4 +31,17 @@ export const USER_ID_CONSTANTS = {
   maxUserIdLength: 32,
   allowedChars: /[a-zA-Z0-9-_.]/g,
   matchRegex: /^(?=.{3,32}$)(?![_.-])(?!.*[_.-]{2})[a-zA-Z0-9._-]+([^._\s-])$/
+};
+
+export const RUNTIME_CONSTANTS = {
+  IS_DEV: NODE_ENV === "DEVELOPMENT"
+};
+
+export const WEB_CONSTANTS = {
+  URL: "https://kakaposocial.com/"
+};
+
+export const PASSWORD_RESET_CONSTANTS = {
+  tokenTTL: 1 * 60 * 60 * 1000, // 1 hour
+  tokenLengthBytes: 64
 };
