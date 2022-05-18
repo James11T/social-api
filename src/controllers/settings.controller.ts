@@ -6,7 +6,7 @@ import type { Request, Response } from "express";
  * @param req Express request object
  * @param res Express response object
  */
-const getSettingsController = (req: Request, res: Response) => {
+const getSettingsController = async (req: Request, res: Response) => {
   // TODO: Implement
 }; // GET
 
@@ -16,7 +16,7 @@ const getSettingsController = (req: Request, res: Response) => {
  * @param req Express request object
  * @param res Express response object
  */
-const getSpecificSettingController = (req: Request, res: Response) => {
+const getSpecificSettingController = async (req: Request, res: Response) => {
   // TODO: Implement
 }; // GET
 
@@ -26,7 +26,7 @@ const getSpecificSettingController = (req: Request, res: Response) => {
  * @param req Express request object
  * @param res Express response object
  */
-const setSettingController = (req: Request, res: Response) => {
+const setSettingController = async (req: Request, res: Response) => {
   // TODO: Implement
 }; // PATCH
 

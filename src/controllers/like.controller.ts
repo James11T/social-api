@@ -8,7 +8,7 @@ import type { Request, Response } from "express";
  * @param req Express request object
  * @param res Express response object
  */
-const queryLikeController = (req: Request, res: Response) => {
+const queryLikeController = async (req: Request, res: Response) => {
   // TODO: Implement
 }; // GET
 
@@ -20,7 +20,7 @@ const queryLikeController = (req: Request, res: Response) => {
  * @param req Express request object
  * @param res Express response object
  */
-const deleteLikeController = (req: Request, res: Response) => {
+const deleteLikeController = async (req: Request, res: Response) => {
   // TODO: Implement
 }; // DELETE
 
@@ -32,7 +32,7 @@ const deleteLikeController = (req: Request, res: Response) => {
  * @param req Express request object
  * @param res Express response object
  */
-const createLikeController = (req: Request, res: Response) => {
+const createLikeController = async (req: Request, res: Response) => {
   // TODO: Implement
 }; // POST
 
@@ -44,7 +44,7 @@ const createLikeController = (req: Request, res: Response) => {
  * @param req Express request object
  * @param res Express response object
  */
-const countLikeController = (req: Request, res: Response) => {
+const countLikeController = async (req: Request, res: Response) => {
   // TODO: Implement
 }; // GET
 

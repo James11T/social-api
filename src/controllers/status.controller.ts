@@ -1,5 +1,4 @@
-import express from "express";
-import type { pingSchemaType } from "../validation/status.validation";
+import express, { NextFunction } from "express";
 
 /**
  * Responds with pong if API is alive
@@ -8,10 +7,11 @@ import type { pingSchemaType } from "../validation/status.validation";
  * @param res Express response object
  */
 const pingController = async (
-  req: express.Request<unknown, unknown, unknown, pingSchemaType>,
-  res: express.Response
+  req: express.Request,
+  res: express.Response,
+  next: NextFunction
 ) => {
-  res.json({ message: "Hello World!" });
+  return res.json({ status: "ONLINE", version: "1.0.0" });
 };
 
 export { pingController };

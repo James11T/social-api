@@ -6,7 +6,7 @@ import type { Request, Response } from "express";
  * @param req Express request object
  * @param res Express response object
  */
-const queryCommentController = (req: Request, res: Response) => {
+const queryCommentController = async (req: Request, res: Response) => {
   // TODO: Implement
 }; // GET
 
@@ -16,7 +16,7 @@ const queryCommentController = (req: Request, res: Response) => {
  * @param req Express request object
  * @param res Express response object
  */
-const createCommentController = (req: Request, res: Response) => {
+const createCommentController = async (req: Request, res: Response) => {
   // TODO: Implement
 }; // POST
 
@@ -26,7 +26,7 @@ const createCommentController = (req: Request, res: Response) => {
  * @param req Express request object
  * @param res Express response object
  */
-const getCommentController = (req: Request, res: Response) => {
+const getCommentController = async (req: Request, res: Response) => {
   // TODO: Implement
 }; // GET
 
@@ -36,7 +36,7 @@ const getCommentController = (req: Request, res: Response) => {
  * @param req Express request object
  * @param res Express response object
  */
-const deleteCommentController = (req: Request, res: Response) => {
+const deleteCommentController = async (req: Request, res: Response) => {
   // TODO: Implement
 }; // DELETE
 
@@ -46,7 +46,7 @@ const deleteCommentController = (req: Request, res: Response) => {
  * @param req Express request object
  * @param res Express response object
  */
-const editCommentController = (req: Request, res: Response) => {
+const editCommentController = async (req: Request, res: Response) => {
   // TODO: Implement
 }; // PATCH
 

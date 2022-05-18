@@ -6,7 +6,7 @@ import type { Request, Response } from "express";
  * @param req Express request object
  * @param res Express response object
  */
-const queryPostsController = (req: Request, res: Response) => {
+const queryPostsController = async (req: Request, res: Response) => {
   // TODO: Implement
 }; // GET
 
@@ -16,7 +16,7 @@ const queryPostsController = (req: Request, res: Response) => {
  * @param req Express request object
  * @param res Express response object
  */
-const createPostController = (req: Request, res: Response) => {
+const createPostController = async (req: Request, res: Response) => {
   // TODO: Implement
 }; // POST
 
@@ -26,7 +26,7 @@ const createPostController = (req: Request, res: Response) => {
  * @param req Express request object
  * @param res Express response object
  */
-const getPostController = (req: Request, res: Response) => {
+const getPostController = async (req: Request, res: Response) => {
   // TODO: Implement
 }; // GET
 
@@ -36,7 +36,7 @@ const getPostController = (req: Request, res: Response) => {
  * @param req Express request object
  * @param res Express response object
  */
-const deletePostController = (req: Request, res: Response) => {
+const deletePostController = async (req: Request, res: Response) => {
   // TODO: Implement
 }; // DELETE
 
@@ -46,7 +46,7 @@ const deletePostController = (req: Request, res: Response) => {
  * @param req Express request object
  * @param res Express response object
  */
-const editPostController = (req: Request, res: Response) => {
+const editPostController = async (req: Request, res: Response) => {
   // TODO: Implement
 }; // PATCH
 

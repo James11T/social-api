@@ -1,4 +1,10 @@
-import type { Request, Response } from "express";
+import { userModel } from "../schemas/user.schema";
+import type { NextFunction, Request, Response } from "express";
+import {
+  APIBadRequestError,
+  APIServerError,
+  APINotFoundError
+} from "../errors/api";
 
 /**
  * Find a user based on attributes like name, email, etc.
@@ -6,8 +12,20 @@ import type { Request, Response } from "express";
  * @param req Express request object
  * @param res Express response object
  */
-const filterUserController = (req: Request, res: Response) => {
-  // TODO: Implement
+const filterUserController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { id } = req.query;
+
+  try {
+    const users = await userModel.find({ userId: new RegExp(`.*${id}.*`) });
+    res.json(users);
+  } catch (err) {
+    console.error(err);
+    return next(new APIServerError());
+  }
 }; // GET
 
 /**
@@ -16,8 +34,22 @@ const filterUserController = (req: Request, res: Response) => {
  * @param req Express request object
  * @param res Express response object
  */
-const getUserController = (req: Request, res: Response) => {
-  // TODO: Implement
+const getUserController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { userId } = req.params;
+
+  if (!userId) return next(new APIBadRequestError("No user ID provided"));
+
+  try {
+    const qRes = await userModel.findOne({ userId });
+    if (!qRes) return next(new APINotFoundError("User not found"));
+    res.json(qRes);
+  } catch (err) {
+    return next(new APIServerError());
+  }
 }; // GET
 
 /**
@@ -26,8 +58,24 @@ const getUserController = (req: Request, res: Response) => {
  * @param req Express request object
  * @param res Express response object
  */
-const getFriendRequestController = (req: Request, res: Response) => {
-  // TODO: Implement
+const getFriendRequestsController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { userId } = req.params;
+  try {
+    const qRes = await userModel.findOne({ userId });
+    if (!qRes) return next(new APINotFoundError("User not found"));
+
+    const friendRequests = qRes.friends
+      .filter((friend) => friend.status === "pendingInbound")
+      .map((friend) => friend.userId);
+
+    return res.json(friendRequests);
+  } catch (err) {
+    return next(new APIServerError());
+  }
 }; // GET
 
 /**
@@ -36,7 +84,23 @@ const getFriendRequestController = (req: Request, res: Response) => {
  * @param req Express request object
  * @param res Express response object
  */
-const sendFriendRequestController = (req: Request, res: Response) => {
+const sendFriendRequestsController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  /*
+    Get current user
+    Check no existing request, inbound or outbound
+    Get target user
+    Add friend request to both users
+  */
+  const { userId } = req.params;
+
+  try {
+  } catch (err) {
+    return next(new APIServerError());
+  }
   // TODO: Implement
 }; // POST
 
@@ -46,14 +110,14 @@ const sendFriendRequestController = (req: Request, res: Response) => {
  * @param req Express request object
  * @param res Express response object
  */
-const getUserFriendsController = (req: Request, res: Response) => {
+const getUserFriendsController = async (req: Request, res: Response) => {
   // TODO: Implement
 }; // GET
 
 export {
   filterUserController,
   getUserController,
-  getFriendRequestController,
-  sendFriendRequestController,
+  getFriendRequestsController,
+  sendFriendRequestsController,
   getUserFriendsController
 };
