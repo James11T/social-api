@@ -100,6 +100,7 @@ const templates = loadTemplates();
 
 export default templates;
 
+// I never want to in my life ever have to make HTML emails ever again.
 // LATO and Raleway
 
 // CID to FILE: /"cid:(.+?)"/ -> "static/$1.png"

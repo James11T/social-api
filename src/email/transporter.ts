@@ -1,6 +1,7 @@
 import nodemailer from "nodemailer";
 import aws from "aws-sdk";
 import templates from "./templates";
+import { RUNTIME_CONSTANTS } from "../constants";
 import type { Attachment } from "nodemailer/lib/mailer";
 
 const {
@@ -46,6 +47,8 @@ const defaultOptions: EmailOptions = {
  * @param options Additional email options
  */
 const sendEmail = async (to: string | string[], options: EmailOptions) => {
+  if (!RUNTIME_CONSTANTS.CAN_SEND_EMAILS) return;
+
   options = { ...defaultOptions, ...options };
 
   await transporter.sendMail({

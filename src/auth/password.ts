@@ -4,8 +4,7 @@ import jwt from "jsonwebtoken";
 import {
   HASHING_CONSTANTS,
   PASSWORD_RESET_CONSTANTS,
-  WEB_CONSTANTS,
-  RUNTIME_CONSTANTS
+  WEB_CONSTANTS
 } from "../constants";
 import { validateEmail } from "../validation/data";
 import { userModel } from "../schemas/user.schema";
@@ -142,13 +141,12 @@ const invokePasswordReset = async (user: HydratedDocument<UserType>) => {
   const resetJWT = jwt.sign(resetPayload, JWT_SECRET);
   const resetLink = `${WEB_CONSTANTS.URL}changepassword?c=${resetJWT}`;
 
-  RUNTIME_CONSTANTS.CAN_SEND_EMAILS &&
-    (await sendTemplate(
-      user.email.value,
-      "resetPassword",
-      { name: user.userId, link: resetLink },
-      { subject: "Password Reset Request" }
-    ));
+  await sendTemplate(
+    user.email.value,
+    "resetPassword",
+    { name: user.userId, link: resetLink },
+    { subject: "Password Reset Request" }
+  );
 
   return resetJWT;
   // TODO: Test
