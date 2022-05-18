@@ -1,5 +1,4 @@
 import mongoose, { Schema } from "mongoose";
-import type { Document } from "mongoose";
 import { validateEmail } from "../validation/data";
 
 interface FriendType {
@@ -7,31 +6,28 @@ interface FriendType {
   status?: "friend" | "pendingInbound" | "pendingOutbound";
 }
 
-interface TokenType {
+interface ResetToken {
   token: string;
-  ip: string;
-  userId: string;
-  lastUsed?: Date;
-  createdAt?: Date;
-  meta?: {
-    device?: "desktop" | "mobile";
-    os?: "windows" | "mac" | "linux" | "android" | "ios" | "other";
-    location?: string | "unknown";
-  };
+  expires: Date;
 }
 
 interface UserType {
   userId: string;
   avatar?: string;
   about?: string;
-  email: string;
+  email: {
+    value: string;
+    verified?: boolean;
+    token?: string;
+  };
   passwordHash: string;
   otp?: {
     status?: "disabled" | "pending" | "enabled";
     secret?: string;
     enabledAt?: Date;
   };
-  friends: FriendType[];
+  friends?: FriendType[];
+  resetTokens?: ResetToken[];
 }
 
 const userSchema = new Schema<UserType>({
@@ -57,10 +53,21 @@ const userSchema = new Schema<UserType>({
     default: ""
   },
   email: {
-    type: String,
-    required: true,
-    trim: true,
-    validate: [validateEmail, "Invalid email"]
+    value: {
+      type: String,
+      required: true,
+      trim: true,
+      validate: [validateEmail, "Invalid email"]
+    },
+    isVerified: {
+      type: Boolean,
+      required: true,
+      default: false
+    },
+    token: {
+      type: String,
+      required: false
+    }
   },
   passwordHash: {
     type: String,
@@ -97,10 +104,27 @@ const userSchema = new Schema<UserType>({
       required: false,
       default: null
     }
-  }
+  },
+  resetTokens: [
+    {
+      token: {
+        type: String,
+        required: true
+      },
+      expires: {
+        type: Date,
+        required: true,
+        default: () => new Date(Date.now() + 1000 * 60 * 60)
+      }
+    }
+  ]
 });
 
 const userModel = mongoose.model<UserType>("user", userSchema);
 
-export { userSchema, userModel };
-export type { UserType, FriendType, TokenType };
+const isUserIDTaken = async (userId: string) => {
+  return (await userModel.findOne({ userId })) !== null;
+};
+
+export { userSchema, userModel, isUserIDTaken };
+export type { UserType, FriendType };

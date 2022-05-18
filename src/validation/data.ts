@@ -56,6 +56,7 @@ const validatePassword = (
  * @returns True if the user id is valid
  */
 const validateUserId = (userId: string) => {
+  if (!userId) return false;
   return userId.match(USER_ID_CONSTANTS.matchRegex) !== null;
   // TODO: Test
 };

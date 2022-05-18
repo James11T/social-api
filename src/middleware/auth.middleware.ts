@@ -1,66 +1,34 @@
-import { HydratedDocument } from "mongoose";
-import { userModel, UserType } from "../schemas/user.schema";
+import { APIUnauthorizedError, APIServerError } from "../errors/api";
+import passport from "passport";
 import type { Request, Response, NextFunction } from "express";
 
-// Assume production for safety
-const { NODE_ENV = "production" } = process.env;
+const authenticate =
+  (strategy: string = "local") =>
+  (req: Request, res: Response, next: NextFunction) => {
+    passport.authenticate(strategy, (err, user, info) => {
+      if (err) return next(err);
+      if (!user) return next(new APIUnauthorizedError(info.message));
 
-/**
- * Authenticates as a development user.
- * Takes either x-user-id header or debugUserId query parameter.
- *
- * @param req The request object
- * @param res The response object
- * @param next The next middleware function
- */
-const developmentAuthentication = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const userId = req.headers["x-user-id"] || req.query["debugUserId"];
+      req.login(user, (loginError) => {
+        if (loginError)
+          return next(new APIServerError("Failed to authenticate"));
+      });
 
-  if (!userId) return next();
-
-  let user: HydratedDocument<UserType>;
-  try {
-    user = await userModel.findOne({ userId });
-  } catch (err) {
-    return res.status(500).json({ error: "Failed to fetch user" });
-  }
-
-  if (!user) return res.status(400).json({ error: "User not found" });
-
-  req.user = user;
-  return next();
-  // #TODO: Test
-};
-
-/**
- * Athenticates a user in a development environment.
- *
- * @param req The request object
- * @param res The response object
- * @param next The next middleware function
- */
-const authenticate = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  if (NODE_ENV === "development")
-    return await developmentAuthentication(req, res, next);
-
-  next();
-  // #TODO: Test
-};
+      req.user = user;
+      next();
+    })(req, res, next);
+  }; // TODO: Test
 
 const protect = async (req: Request, res: Response, next: NextFunction) => {
-  if (!req.user) return res.status(401).json({ error: "Not authenticated" });
+  if (!req.user)
+    return next(
+      new APIUnauthorizedError(
+        "You must be authenticated to access this resource."
+      )
+    );
 
   next();
-
-  // #TODO: Test
+  // TODO: Test
 };
 
 export { authenticate, protect };

@@ -4,7 +4,6 @@ import cookieParser from "cookie-parser";
 import passport from "passport";
 import session from "express-session";
 import { Strategy as LocalStrategy } from "passport-local";
-import { authenticate } from "./middleware/auth.middleware";
 import { verify } from "./auth/password";
 import baseRouter from "./routes";
 import errorHandler from "./middleware/error.middleware";
@@ -35,9 +34,14 @@ app.use(passport.session()); // Initialize Passport sessions
 
 app.disable("x-powered-by"); // Disable X-Powered-By header
 
-passport.use(new LocalStrategy({ passReqToCallback: true }, verify));
+passport.use(
+  new LocalStrategy(
+    { passReqToCallback: true, usernameField: "userId" },
+    verify
+  )
+);
 
-app.use("/api/v1", authenticate, baseRouter);
+app.use("/api/v1", baseRouter);
 
 app.use(errorHandler);
 

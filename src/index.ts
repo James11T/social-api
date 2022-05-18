@@ -1,7 +1,6 @@
 import "dotenv/config";
 import mongoose from "mongoose";
 import ip from "ip";
-
 import app from "./app";
 
 const { PORT, DB_URL } = process.env;

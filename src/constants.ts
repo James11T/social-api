@@ -1,6 +1,6 @@
 import { argon2id } from "argon2";
 
-const { NODE_ENV } = process.env;
+const { NODE_ENV, SEND_EMAILS_IN_DEV } = process.env;
 
 export interface PasswordRequirements {
   minPasswordLength?: number;
@@ -33,8 +33,11 @@ export const USER_ID_CONSTANTS = {
   matchRegex: /^(?=.{3,32}$)(?![_.-])(?!.*[_.-]{2})[a-zA-Z0-9._-]+([^._\s-])$/
 };
 
+const isDevelopmentEnv = NODE_ENV === "DEVELOPMENT";
+
 export const RUNTIME_CONSTANTS = {
-  IS_DEV: NODE_ENV === "DEVELOPMENT"
+  IS_DEV: isDevelopmentEnv,
+  CAN_SEND_EMAILS: !isDevelopmentEnv || (isDevelopmentEnv && SEND_EMAILS_IN_DEV)
 };
 
 export const WEB_CONSTANTS = {

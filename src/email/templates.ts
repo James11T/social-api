@@ -76,7 +76,6 @@ const loadTemplate = (dirName: string): APITemplate => {
  */
 const loadTemplates = () => {
   const templates: Templates = {};
-  console.log("Loading templates email templates.");
 
   // Get all directory names in the template directory
   const templateFolders = fs

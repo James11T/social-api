@@ -1,10 +1,21 @@
 import argon2 from "argon2";
-import { HASHING_CONSTANTS } from "../constants";
+import crypto from "crypto";
+import jwt from "jsonwebtoken";
+import {
+  HASHING_CONSTANTS,
+  PASSWORD_RESET_CONSTANTS,
+  WEB_CONSTANTS,
+  RUNTIME_CONSTANTS
+} from "../constants";
 import { validateEmail } from "../validation/data";
 import { userModel } from "../schemas/user.schema";
-import speakeasy from "speakeasy";
+import { HydratedDocument } from "mongoose";
+import { sendTemplate } from "../email/transporter";
+import { verifyOTP } from "./otp";
 import type { UserType } from "../schemas/user.schema";
 import type { Request } from "express";
+
+const { JWT_SECRET, SEND_EMAILS_IN_DEV } = process.env;
 
 const hashingOptions = {
   type: HASHING_CONSTANTS.HASHING_FUNCTION,
@@ -26,7 +37,7 @@ const verifyPassword = async (password: string, hash: string) => {
 };
 
 /**
- * Hash a password either with a generated salt or with a given salt.
+ * Hash a password either with a generated salt.
  *
  * @param password A password to hash
  * @returns A password hash and salt
@@ -56,7 +67,7 @@ const verify = async (
   const isEmail = validateEmail(username);
   const query = isEmail ? { email: username } : { userId: username };
 
-  let user: UserType;
+  let user: HydratedDocument<UserType>;
   try {
     user = await userModel.findOne(query);
   } catch (err) {
@@ -80,10 +91,7 @@ const verify = async (
 
     let optValid: boolean;
     try {
-      optValid = speakeasy.totp.verify({
-        secret: user.otp.secret,
-        token: otp
-      });
+      optValid = verifyOTP(user, otp);
     } catch (err) {
       return done(null, false, { message: "Failed to validate OTP" });
     }
@@ -94,4 +102,56 @@ const verify = async (
   return done(null, user);
 };
 
-export { verifyPassword, hashPassword, verify };
+/**
+ * Generates a password reset token.
+ *
+ * @returns A random token
+ */
+const getResetToken = () => {
+  return crypto
+    .randomBytes(PASSWORD_RESET_CONSTANTS.tokenLengthBytes)
+    .toString("hex");
+};
+
+export interface ChangePasswordToken {
+  token: string;
+  userId: string;
+}
+
+/**
+ * Generate a password reset token and add it to the user's reset tokens.
+ * Send an email with the token to the user.
+ *
+ * @param user User who requested a password reset
+ * @returns A password reset token
+ */
+const invokePasswordReset = async (user: HydratedDocument<UserType>) => {
+  const token = getResetToken();
+
+  const dbToken = {
+    token: token,
+    expires: Date.now() + PASSWORD_RESET_CONSTANTS.tokenTTL
+  };
+
+  await userModel.updateOne(
+    { _id: user._id },
+    { $push: { resetTokens: [dbToken] } }
+  );
+
+  const resetPayload: ChangePasswordToken = { token, userId: user.userId };
+  const resetJWT = jwt.sign(resetPayload, JWT_SECRET);
+  const resetLink = `${WEB_CONSTANTS.URL}changepassword?c=${resetJWT}`;
+
+  RUNTIME_CONSTANTS.CAN_SEND_EMAILS &&
+    (await sendTemplate(
+      user.email.value,
+      "resetPassword",
+      { name: user.userId, link: resetLink },
+      { subject: "Password Reset Request" }
+    ));
+
+  return resetJWT;
+  // TODO: Test
+};
+
+export { verifyPassword, hashPassword, verify, invokePasswordReset };
