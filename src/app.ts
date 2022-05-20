@@ -7,7 +7,7 @@ import { Strategy as LocalStrategy } from "passport-local";
 import { verify } from "./auth/password";
 import baseRouter from "./routes";
 import errorHandler from "./middleware/error.middleware";
-import { setRealIp } from "./middleware/pre.middleware";
+import setRequestMeta from "./middleware/pre.middleware";
 
 import "./auth/session";
 
@@ -15,7 +15,7 @@ const { SESSION_SECRET } = process.env;
 
 const app = express();
 
-app.use(setRealIp);
+app.use(setRequestMeta);
 app.use(
   session({
     secret: SESSION_SECRET,

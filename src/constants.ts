@@ -2,6 +2,8 @@ import { argon2id } from "argon2";
 
 const { NODE_ENV, SEND_EMAILS_IN_DEV } = process.env;
 
+const sendEmailsInDev = SEND_EMAILS_IN_DEV === "true";
+
 export interface PasswordRequirements {
   minPasswordLength?: number;
   maxPasswordLength?: number;
@@ -37,7 +39,7 @@ const isDevelopmentEnv = NODE_ENV === "DEVELOPMENT";
 
 export const RUNTIME_CONSTANTS = {
   IS_DEV: isDevelopmentEnv,
-  CAN_SEND_EMAILS: !isDevelopmentEnv || (isDevelopmentEnv && SEND_EMAILS_IN_DEV)
+  CAN_SEND_EMAILS: !isDevelopmentEnv || (isDevelopmentEnv && sendEmailsInDev)
 };
 
 export const WEB_CONSTANTS = {
