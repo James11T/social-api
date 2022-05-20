@@ -15,6 +15,7 @@ import { getVerificationToken } from "../email/verification";
 import { sendTemplate } from "../email/transporter";
 import { WEB_CONSTANTS, RUNTIME_CONSTANTS } from "../constants";
 import { verifyOTP } from "../auth/otp";
+import { countryCodeEmoji } from "country-code-emoji";
 import type { NextFunction, Request, Response } from "express";
 
 const { JWT_SECRET } = process.env;
@@ -240,6 +241,21 @@ const activate2FA = async (
     return next(new APIServerError("Failed to activate 2FA"));
   }
 
+  try {
+    await sendTemplate(
+      req.user.email.value,
+      "2FAEnabled",
+      {
+        name: req.user.userId,
+        request: {
+          ip: req.realIp,
+          flag: countryCodeEmoji(req.country)
+        }
+      },
+      { subject: "2FA Enabled" }
+    );
+  } catch {}
+
   return res.json({ success: true });
 
   // TODO: Test
@@ -279,6 +295,21 @@ const disable2FA = async (
     return next(new APIServerError("Failed to disable 2FA"));
   }
 
+  try {
+    await sendTemplate(
+      req.user.email.value,
+      "2FADisabled",
+      {
+        name: req.user.userId,
+        request: {
+          ip: req.realIp,
+          flag: countryCodeEmoji(req.country)
+        }
+      },
+      { subject: "2FA Disabled" }
+    );
+  } catch {}
+
   return res.json({ success: true });
 
   // TODO: Test
@@ -295,9 +326,11 @@ const whoAmIController = async (
   res: Response,
   next: NextFunction
 ) => {
-  if (!req.user) return next(new APIUnauthorizedError("Not signed in"));
+  if (!req.user) {
+    return res.json({ user: null });
+  }
 
-  return res.json(req.user);
+  return res.json({ user: req.user });
 
   // TODO: Test
 };
