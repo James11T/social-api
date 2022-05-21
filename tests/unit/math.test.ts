@@ -1,4 +1,4 @@
-import { clamp } from "../../../src/utils/math";
+import { clamp } from "../../src/utils/math";
 
 describe("clamp function", () => {
   it("should clamp up to min", () => {

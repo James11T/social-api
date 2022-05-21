@@ -1,7 +1,4 @@
-import {
-  countOccurrences,
-  stripFileExtention
-} from "../../../src/utils/strings";
+import { countOccurrences, stripFileExtention } from "../../src/utils/strings";
 
 describe("count occurrences", () => {
   it("should find 1 occurence", () => {

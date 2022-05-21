@@ -1,5 +1,5 @@
-import { PasswordRequirements } from "../../../src/constants";
-import { validateEmail, validatePassword } from "../../../src/validation/data";
+import { PasswordRequirements } from "../../src/constants";
+import { validateEmail, validatePassword } from "../../src/validation/data";
 
 // https://gist.github.com/cjaoude/fd9910626629b53c4d25
 
@@ -39,26 +39,15 @@ const invalidEmails = [
 ];
 
 describe("email validation", () => {
-  it("should be valid with regular email", () => {
-    expect(validateEmail("example@example.com")).toBeTruthy();
+  describe("valid emails", () => {
+    test.each(validEmails)("should accept: %s", (email) => {
+      expect(validateEmail(email)).toBeTruthy();
+    });
   });
-
-  it(`should return true for ${validEmails.length} valid emails`, () => {
-    const isValid = validEmails.reduce(
-      (prev, curr) => prev && validateEmail(curr),
-      true
-    );
-
-    expect(isValid).toBeTruthy();
-  });
-
-  it(`should return false for ${invalidEmails.length} invalid emails`, () => {
-    const isInvalid = invalidEmails.reduce(
-      (prev, curr) => prev && !validateEmail(curr),
-      true
-    );
-
-    expect(isInvalid).toBeTruthy();
+  describe("invalid emails", () => {
+    test.each(invalidEmails)("should reject: %s", (email) => {
+      expect(validateEmail(email)).toBeFalsy();
+    });
   });
 });
 

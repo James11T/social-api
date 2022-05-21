@@ -1,10 +1,11 @@
 import { userModel } from "../schemas/user.schema";
-import type { NextFunction, Request, Response } from "express";
 import {
   APIBadRequestError,
   APIServerError,
   APINotFoundError
 } from "../errors/api";
+import mongoose from "mongoose";
+import type { NextFunction, Request, Response } from "express";
 
 /**
  * Find a user based on attributes like name, email, etc.
@@ -17,10 +18,10 @@ const filterUserController = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { id } = req.query;
+  const { userid: userId } = req.query;
 
   try {
-    const users = await userModel.find({ userId: new RegExp(`.*${id}.*`) });
+    const users = await userModel.find({ userId: new RegExp(`.*${userId}.*`) });
     res.json(users);
   } catch (err) {
     console.error(err);
@@ -40,8 +41,6 @@ const getUserController = async (
   next: NextFunction
 ) => {
   const { userId } = req.params;
-
-  if (!userId) return next(new APIBadRequestError("No user ID provided"));
 
   try {
     const qRes = await userModel.findOne({ userId });
@@ -64,18 +63,21 @@ const getFriendRequestsController = async (
   next: NextFunction
 ) => {
   const { userId } = req.params;
+
+  let user;
   try {
-    const qRes = await userModel.findOne({ userId });
-    if (!qRes) return next(new APINotFoundError("User not found"));
-
-    const friendRequests = qRes.friends
-      .filter((friend) => friend.status === "pendingInbound")
-      .map((friend) => friend.userId);
-
-    return res.json(friendRequests);
+    user = await userModel.findOne({ userId });
   } catch (err) {
-    return next(new APIServerError());
+    return next(new APIServerError("Failed to fetch user"));
   }
+
+  if (!user) return next(new APINotFoundError("User not found"));
+
+  const friendRequests = user.friends
+    .filter((friend) => friend.status === "pendingInbound")
+    .map((friend) => friend.userId);
+
+  return res.json(friendRequests);
 }; // GET
 
 /**
@@ -89,19 +91,69 @@ const sendFriendRequestsController = async (
   res: Response,
   next: NextFunction
 ) => {
-  /*
-    Get current user
-    Check no existing request, inbound or outbound
-    Get target user
-    Add friend request to both users
-  */
   const { userId } = req.params;
 
+  let user;
   try {
+    user = await userModel.findOne({ userId });
   } catch (err) {
-    return next(new APIServerError());
+    return next(new APIServerError("Failed to fetch user"));
   }
-  // TODO: Implement
+
+  if (!user) return next(new APINotFoundError("User not found"));
+
+  if (user._id === req.user._id)
+    return next(
+      new APIBadRequestError("Cannot send a friend request to yourself")
+    );
+
+  const existingFriendStatus = req.user.friends.find(
+    (friend) => friend.userId === userId
+  );
+
+  if (existingFriendStatus) {
+    if (existingFriendStatus.status === "pendingInbound") {
+      return next(
+        new APIBadRequestError(
+          "You already have a friend request from this user"
+        )
+      );
+    } else if (existingFriendStatus.status === "friend") {
+      return next(
+        new APIBadRequestError("You are already friends with this user")
+      );
+    }
+  }
+
+  const friendRequestOutbound = {
+    userId,
+    status: "pendingOutbound"
+  };
+
+  const friendRequestInbound = {
+    userId: req.user.userId,
+    status: "pendingInbound"
+  };
+
+  const session = await mongoose.startSession();
+  try {
+    session.startTransaction();
+    await req.user.updateOne({
+      $push: { friends: friendRequestOutbound }
+    });
+
+    await user.updateOne({
+      $push: { friends: friendRequestInbound }
+    });
+    session.commitTransaction();
+  } catch (err) {
+    await session.abortTransaction();
+    return next(new APIServerError("Failed to send friend request"));
+  }
+
+  return res.json({ success: true });
+
+  // TODO: Test
 }; // POST
 
 /**
@@ -110,8 +162,47 @@ const sendFriendRequestsController = async (
  * @param req Express request object
  * @param res Express response object
  */
-const getUserFriendsController = async (req: Request, res: Response) => {
-  // TODO: Implement
+const getUserFriendsController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { userId } = req.params;
+
+  let user;
+  try {
+    user = await userModel.findOne({ userId });
+  } catch (err) {
+    return next(new APIServerError("Failed to fetch user"));
+  }
+
+  if (!user) return next(new APINotFoundError("User not found"));
+
+  const friends = user.friends
+    .filter((friend) => friend.status === "friend")
+    .map((friend) => friend.userId);
+
+  return res.json(friends);
+  // TODO: Test
+}; // GET
+
+const isUserIdAvailabileController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { userId } = req.params;
+
+  let isAvailable: boolean;
+  try {
+    isAvailable = !(await userModel.exists({ userId }));
+  } catch (err) {
+    return next(new APIServerError("Failed to check user ID availability"));
+  }
+
+  return res.json({ available: isAvailable });
+
+  // TODO: Test
 }; // GET
 
 export {
@@ -119,5 +210,6 @@ export {
   getUserController,
   getFriendRequestsController,
   sendFriendRequestsController,
-  getUserFriendsController
+  getUserFriendsController,
+  isUserIdAvailabileController
 };

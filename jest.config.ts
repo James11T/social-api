@@ -1,7 +1,7 @@
 import type { Config } from "@jest/types";
 
 const config: Config.InitialOptions = {
-  //verbose: true,
+  verbose: true,
   maxWorkers: 1,
   transform: {
     "^.+\\.tsx?$": "ts-jest"

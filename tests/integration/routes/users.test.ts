@@ -1,9 +1,9 @@
 import "dotenv/config";
 import request from "supertest";
 import mongoose from "mongoose";
+import app from "../../../src/app";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import { userModel } from "../../../src/schemas/user.schema";
-import app from "../../../src/app";
 import type { UserType } from "../../../src/schemas/user.schema";
 
 const testUsers: UserType[] = [
@@ -35,7 +35,7 @@ const testUsers: UserType[] = [
     passwordHash: "abc123",
     friends: [
       {
-        userId: "testuser3",
+        userId: "testuser4",
         status: "pendingInbound"
       }
     ]
@@ -46,7 +46,7 @@ const testUsers: UserType[] = [
     passwordHash: "abc123",
     friends: [
       {
-        userId: "testuser4",
+        userId: "testuser3",
         status: "pendingOutbound"
       }
     ]
@@ -84,19 +84,19 @@ describe("GET /users/:id", () => {
 
 describe("GET /users/?id=testuser", () => {
   it(`should return status code 200 and ${testUsers.length} users`, async () => {
-    const res = await request(app).get("/api/v1/users/?id=testuser");
+    const res = await request(app).get("/api/v1/users?userid=testuser");
     expect(res.status).toBe(200);
     expect(res.body.length).toBe(testUsers.length);
   });
 
   it("should return status code 200 and 1 users", async () => {
-    const res = await request(app).get("/api/v1/users/?id=user2");
+    const res = await request(app).get("/api/v1/users?userid=user2");
     expect(res.status).toBe(200);
     expect(res.body.length).toBe(1);
   });
 
   it("should return status code 200 and 0 users", async () => {
-    const res = await request(app).get("/api/v1/users/?id=nobodylikethis");
+    const res = await request(app).get("/api/v1/users?userid=nobodylikethis");
     expect(res.status).toBe(200);
     expect(res.body.length).toBe(0);
   });
@@ -116,6 +116,8 @@ describe("GET /users/:userId/friendRequests", () => {
     const res = await request(app).get(
       "/api/v1/users/testuser3/friendRequests"
     );
+
+    console.log(res.body);
 
     expect(res.status).toBe(200);
     expect(res.body.length).toBe(1);
