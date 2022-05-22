@@ -14,7 +14,7 @@ import { verifyOTP } from "./otp";
 import type { UserType } from "../schemas/user.schema";
 import type { Request } from "express";
 
-const { JWT_SECRET, SEND_EMAILS_IN_DEV } = process.env;
+const { JWT_SECRET } = process.env;
 
 const hashingOptions = {
   type: HASHING_CONSTANTS.HASHING_FUNCTION,
