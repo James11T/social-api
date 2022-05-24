@@ -2,12 +2,20 @@ import "dotenv/config";
 import mongoose from "mongoose";
 import ip from "ip";
 import app from "./app";
+import { RUNTIME_CONSTANTS } from "./constants";
 
 const { PORT, DB_URL } = process.env;
 
-console.log(`NODE_ENV = ${process.env.NODE_ENV}`);
+if (RUNTIME_CONSTANTS.IS_DEV) {
+  console.log("Running in development mode");
+}
 
-mongoose.connect(DB_URL, () => {
+mongoose.connect(DB_URL, (error) => {
+  if (error) {
+    console.error("Failed to connect to MongoDB", error);
+    return;
+  }
+
   console.log(`Connected to MongoDB`);
 
   app.listen(PORT, () => {
