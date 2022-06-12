@@ -7,6 +7,11 @@ import {
 import mongoose from "mongoose";
 import type { NextFunction, Request, Response } from "express";
 
+interface FilterQuery {
+  userid: string;
+  limit?: number;
+}
+
 /**
  * Find a user based on attributes like name, email, etc.
  *
@@ -14,14 +19,17 @@ import type { NextFunction, Request, Response } from "express";
  * @param res Express response object
  */
 const filterUserController = async (
-  req: Request,
+  req: Request<unknown, unknown, unknown, FilterQuery>,
   res: Response,
   next: NextFunction
 ) => {
-  const { userid: userId } = req.query;
+  // TODO: Add pagnination
+  const { userid: userId, limit = 20 } = req.query;
 
   try {
-    const users = await userModel.find({ userId: new RegExp(`.*${userId}.*`) });
+    const users = await userModel
+      .find({ userId: new RegExp(`.*${userId}.*`) })
+      .limit(limit);
     res.json(users);
   } catch (err) {
     console.error(err);

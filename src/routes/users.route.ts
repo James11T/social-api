@@ -10,7 +10,7 @@ import {
 import { protect } from "../middleware/auth.middleware";
 import { validateUserQuery } from "../validation/routes/users.validation";
 
-const usersRouter = Router();
+const usersRouter = Router(); // /users
 
 usersRouter.get("/", validateUserQuery, filterUserController);
 usersRouter.get("/:userId", getUserController);
