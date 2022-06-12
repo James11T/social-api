@@ -10,13 +10,13 @@ import {
   APIUnauthorizedError
 } from "../errors/api";
 import { hashPassword, invokePasswordReset } from "../auth/password";
-import type { ChangePasswordToken } from "../auth/password";
 import { getVerificationToken } from "../email/verification";
 import { sendTemplate } from "../email/transporter";
 import { WEB_CONSTANTS, RUNTIME_CONSTANTS } from "../constants";
 import { verifyOTP } from "../auth/otp";
 import { countryCodeEmoji } from "country-code-emoji";
 import type { NextFunction, Request, Response } from "express";
+import type { ChangePasswordToken } from "../auth/password";
 
 const { JWT_SECRET } = process.env;
 
