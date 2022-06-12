@@ -1,0 +1,219 @@
+openapi: "3.0.2"
+info:
+  title: Kakapo API
+  version: 1.0.0
+  description: API for the application
+servers:
+  - url: http://localhost:5000/api/v1
+paths:
+  /users:
+    get:
+      description: Filter users by specific parameters
+      operationId: filterUsers
+      parameters:
+        - name: limit
+          in: query
+          description: Limit of users to return
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: userid
+          in: query
+          description: User ID to filter by
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+      tags:
+        - Users
+  /users/{userId}:
+    get:
+      description: Get a user by ID
+      operationId: getUser
+      parameters:
+        - name: userId
+          in: path
+          description: User ID to fetch
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      tags:
+        - Users
+  /users/{userId}/idavailable:
+    get:
+      description: Check if a user ID is available
+      operationId: checkUserIdAvailable
+      parameters:
+        - name: userId
+          in: path
+          description: User ID to check
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  available:
+                    type: boolean
+                    description: True if the ID is available
+      tags:
+        - Users
+  /users/{userId}/friends:
+    get:
+      description: Get a user's friends
+      operationId: getUserFriends
+      parameters:
+        - name: userId
+          in: path
+          description: User ID to fetch
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      tags:
+        - Users
+  /users/{userId}/friends/requests:
+    get:
+      description: Get a user's friend requests
+      operationId: getUserFriendRequests
+      parameters:
+        - name: userId
+          in: path
+          description: User ID to fetch
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      tags:
+        - Users
+    post:
+      description: Send a friend request
+      operationId: sendFriendRequest
+      parameters:
+        - name: userId
+          in: path
+          description: User ID to send the request to
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: True if the request was sent successfully
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                sendSelfRequest:
+                  summary: "Self Request"
+                  value:
+                    message: "You cannot send a friend request to yourself"
+                alreadyFriends:
+                  summary: "Already Friends"
+                  value:
+                    message: "You are already friends with this user"
+                alreadyRequested:
+                  summary: "Already requested"
+                  value:
+                    message: "You have already sent a friend request to this user"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "User not found"
+      tags:
+        - Users
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        userid:
+          type: string
+          description: A users primary identifcation
+          example: Bob123
+        about:
+          type: string
+          example: "I am a user, and I like to code"
+        avatar:
+          type: string
+          format: uri
+          description: A link to a users avatar file
+          example: http://cdn.example.com/kajsfdodas.png
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: A message describing the error
+          example: "The requested resource was not found"
