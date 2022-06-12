@@ -82,7 +82,7 @@ describe("GET /users/:id", () => {
   });
 });
 
-describe("GET /users/?id=testuser", () => {
+describe("GET /users?id=testuser", () => {
   it(`should return status code 200 and ${testUsers.length} users`, async () => {
     const res = await request(app).get("/api/v1/users?userid=testuser");
     expect(res.status).toBe(200);
