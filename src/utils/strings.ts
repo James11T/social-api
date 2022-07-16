@@ -1,3 +1,5 @@
+import { v4 as uuid4 } from "uuid";
+
 /**
  * Count the occourences of a regex in a string
  *
@@ -29,4 +31,11 @@ const stripFileExtention = (filename: string) => {
   // TODO: Test
 };
 
-export { countOccurrences, stripFileExtention };
+/**
+ * Essentially a UUIDv4, but without the hyphens
+ *
+ * @returns A unique string of length 32
+ */
+const uniqueString = () => uuid4().replace("-", "");
+
+export { countOccurrences, stripFileExtention, uniqueString };
