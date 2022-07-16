@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer";
-import aws from "aws-sdk";
+import AWS from "aws-sdk";
 import templates from "./templates";
 import { RUNTIME_CONSTANTS } from "../constants";
 import type { Attachment } from "nodemailer/lib/mailer";
@@ -8,7 +8,8 @@ const {
   AWS_SES_ACCESS_KEY_ID,
   AWS_SES_SECRET_ACCESS_KEY,
   AWS_REGION,
-  MAIL_DOMAIN
+  MAIL_SUBDOMAIN,
+  WEB_DOMAIN
 } = process.env;
 
 const SES_CONFIG = {
@@ -18,10 +19,10 @@ const SES_CONFIG = {
   sslEnabled: true
 };
 
-const ses = new aws.SES(SES_CONFIG);
+const ses = new AWS.SES(SES_CONFIG);
 
 let transporter = nodemailer.createTransport({
-  SES: { ses, aws },
+  SES: { ses, AWS },
   sendingRate: 1
 });
 
@@ -54,7 +55,7 @@ const sendEmail = async (to: string | string[], options: EmailOptions) => {
   await transporter.sendMail({
     from: {
       name: options.name,
-      address: `${options.user}@${MAIL_DOMAIN}`
+      address: `${options.user}@${MAIL_SUBDOMAIN}.${WEB_DOMAIN}`
     },
     to,
     subject: options.subject,
