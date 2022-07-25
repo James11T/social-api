@@ -28,6 +28,7 @@ interface UserType {
   };
   friends?: FriendType[];
   resetTokens?: ResetToken[];
+  // TODO: Add signup date
 }
 
 const userSchema = new Schema<UserType>({
@@ -74,6 +75,7 @@ const userSchema = new Schema<UserType>({
     required: true
   },
   friends: [
+    // TODO: Overhaul
     {
       userId: {
         type: String,

@@ -1,4 +1,5 @@
 import { v4 as uuid4 } from "uuid";
+import chalk from "chalk";
 
 /**
  * Count the occourences of a regex in a string
@@ -36,6 +37,16 @@ const stripFileExtention = (filename: string) => {
  *
  * @returns A unique string of length 32
  */
-const uniqueString = () => uuid4().replace("-", "");
+const uniqueString = () => uuid4().replace(/-/g, "");
 
-export { countOccurrences, stripFileExtention, uniqueString };
+const colorizeHTTPCode = (code: number) => {
+  if (code < 400) {
+    return chalk.green(code);
+  } else if (code < 500) {
+    return chalk.yellow(code);
+  } else {
+    return chalk.red(code);
+  }
+};
+
+export { countOccurrences, stripFileExtention, uniqueString, colorizeHTTPCode };
