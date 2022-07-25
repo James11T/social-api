@@ -12,7 +12,7 @@ import {
 import { hashPassword, invokePasswordReset } from "../auth/password";
 import { getVerificationToken } from "../email/verification";
 import { sendTemplate } from "../email/transporter";
-import { WEB_CONSTANTS, RUNTIME_CONSTANTS } from "../constants";
+import { WEB_CONSTANTS, RUNTIME_CONSTANTS } from "../config";
 import { verifyOTP } from "../auth/otp";
 import { countryCodeEmoji } from "country-code-emoji";
 import type { NextFunction, Request, Response } from "express";
@@ -31,6 +31,7 @@ const signInController = async (
   res: Response,
   next: NextFunction
 ) => {
+  // If the controller is reached then passport succeeded
   return res.json({ success: true, user: { userId: req.user.userId } });
 
   // TODO: Test

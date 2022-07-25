@@ -1,4 +1,4 @@
-import { RUNTIME_CONSTANTS } from "../constants";
+import { RUNTIME_CONSTANTS } from "../config";
 
 class APIBaseError extends Error {
   status: number;

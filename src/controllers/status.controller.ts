@@ -1,5 +1,5 @@
 import express, { NextFunction } from "express";
-import { RUNTIME_CONSTANTS } from "../constants";
+import { RUNTIME_CONSTANTS } from "../config";
 import { getMemeoryUsage } from "../utils/process";
 
 /**

@@ -1,4 +1,6 @@
 import { argon2id } from "argon2";
+import bytes from "bytes";
+import parseDuration from "parse-duration";
 
 const { NODE_ENV, SEND_EMAILS_IN_DEV } = process.env;
 
@@ -35,7 +37,7 @@ export const USER_ID_CONSTANTS = {
   matchRegex: /^(?=.{3,32}$)(?![_.-])(?!.*[_.-]{2})[a-zA-Z0-9._-]+([^._\s-])$/
 };
 
-const isDevelopmentEnv = NODE_ENV === "DEVELOPMENT";
+const isDevelopmentEnv = NODE_ENV.toUpperCase() === "DEVELOPMENT";
 
 export const RUNTIME_CONSTANTS = {
   IS_DEV: isDevelopmentEnv,
@@ -43,10 +45,18 @@ export const RUNTIME_CONSTANTS = {
 };
 
 export const WEB_CONSTANTS = {
-  URL: "https://kakaposocial.com/"
+  URL: "https://kakaposocial.com/",
+  MAIL_SUBDOMAIN: "mail",
+  MEDIA_SUBDOMAIN: "media"
 };
 
 export const PASSWORD_RESET_CONSTANTS = {
-  tokenTTL: 1 * 60 * 60 * 1000, // 1 hour
+  tokenTTL: parseDuration("1hr", "ms"), // 1 hour
   tokenLengthBytes: 64
+};
+
+export const POST_CONSTANTS = {
+  MAX_MEDIA_COUNT: 8,
+  MAX_MEDIA_SIZE: bytes.parse("50MB"),
+  ALLOWED_MEDIA_TYPES: ["image/jpeg", "image/png"]
 };

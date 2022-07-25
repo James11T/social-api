@@ -1,20 +1,15 @@
 import nodemailer from "nodemailer";
 import AWS from "aws-sdk";
 import templates from "./templates";
-import { RUNTIME_CONSTANTS } from "../constants";
+import { RUNTIME_CONSTANTS, WEB_CONSTANTS } from "../config";
 import type { Attachment } from "nodemailer/lib/mailer";
 
-const {
-  AWS_SES_ACCESS_KEY_ID,
-  AWS_SES_SECRET_ACCESS_KEY,
-  AWS_REGION,
-  MAIL_SUBDOMAIN,
-  WEB_DOMAIN
-} = process.env;
+const { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, WEB_DOMAIN } =
+  process.env;
 
 const SES_CONFIG = {
-  accessKeyId: AWS_SES_ACCESS_KEY_ID,
-  secretAccessKey: AWS_SES_SECRET_ACCESS_KEY,
+  accessKeyId: AWS_ACCESS_KEY_ID,
+  secretAccessKey: AWS_SECRET_ACCESS_KEY,
   region: AWS_REGION,
   sslEnabled: true
 };
@@ -55,7 +50,7 @@ const sendEmail = async (to: string | string[], options: EmailOptions) => {
   await transporter.sendMail({
     from: {
       name: options.name,
-      address: `${options.user}@${MAIL_SUBDOMAIN}.${WEB_DOMAIN}`
+      address: `${options.user}@${WEB_CONSTANTS.MAIL_SUBDOMAIN}.${WEB_DOMAIN}`
     },
     to,
     subject: options.subject,

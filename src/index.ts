@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import ip from "ip";
 import chalk from "chalk";
 import app from "./app";
-import { RUNTIME_CONSTANTS } from "./constants";
+import { RUNTIME_CONSTANTS } from "./config";
 
 const { PORT, DB_URL } = process.env;
 

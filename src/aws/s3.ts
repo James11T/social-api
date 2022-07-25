@@ -1,11 +1,11 @@
 import AWS from "aws-sdk";
 
-const { WEB_DOMAIN, MEDIA_SUBDOMAIN, AWS_S3_ACCESS_KEY_ID, AWS_S3_ACCESS_KEY } =
+const { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_S3_IMAGE_BUCKET } =
   process.env;
 
 const s3 = new AWS.S3({
-  accessKeyId: AWS_S3_ACCESS_KEY_ID,
-  secretAccessKey: AWS_S3_ACCESS_KEY
+  accessKeyId: AWS_ACCESS_KEY_ID,
+  secretAccessKey: AWS_SECRET_ACCESS_KEY
 });
 
 /**
@@ -19,7 +19,7 @@ const s3 = new AWS.S3({
 const uploadFile = async (
   file: Buffer,
   key: string,
-  bucket = `${MEDIA_SUBDOMAIN}.${WEB_DOMAIN}`
+  bucket = AWS_S3_IMAGE_BUCKET
 ) => {
   const params = {
     Bucket: bucket,

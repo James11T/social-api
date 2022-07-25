@@ -3,7 +3,7 @@ import {
   PasswordRequirements,
   PASSWORD_CONSTANTS,
   USER_ID_CONSTANTS
-} from "../constants";
+} from "../config";
 
 /**
  * Check if a email is in valid format

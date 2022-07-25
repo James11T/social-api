@@ -5,7 +5,7 @@ import {
   HASHING_CONSTANTS,
   PASSWORD_RESET_CONSTANTS,
   WEB_CONSTANTS
-} from "../constants";
+} from "../config";
 import { validateEmail } from "../validation/data";
 import { userModel } from "../schemas/user.schema";
 import { HydratedDocument } from "mongoose";
