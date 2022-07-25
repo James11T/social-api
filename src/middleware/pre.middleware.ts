@@ -1,5 +1,6 @@
-import { RUNTIME_CONSTANTS } from "../constants";
 import geoip from "geoip-country";
+import chalk from "chalk";
+import { colorizeHTTPCode } from "../utils/strings";
 import type { Request, Response, NextFunction } from "express";
 
 const FAIL_COUNTRY_CODE = "ZZ";
@@ -7,16 +8,18 @@ const FAIL_COUNTRY_CODE = "ZZ";
 const setRealIp = (req: Request, res: Response, next: NextFunction) => {
   let ip = req.ip;
 
-  if (!RUNTIME_CONSTANTS.IS_DEV) {
-    ip = String(
-      req.headers["x-real-ip"] || req.headers["cf-connecting-ip"] || ip
-    );
-  }
+  ip = String(
+    req.header("x-real-ip") ?? // Universal header for real IP
+      req.header("cf-connecting-ip") ?? // Cloudflare
+      req.header("x-forwarded-for") ?? // Universal
+      ip // Fallback to IP, likely local connection
+  );
 
   req.realIp = ip;
   next();
 };
 
+// Attempt to get the country code from the request IP address
 const setRequestCountry = (req: Request, res: Response, next: NextFunction) => {
   const ip = req.realIp;
 
@@ -38,7 +41,30 @@ const setRequestCountry = (req: Request, res: Response, next: NextFunction) => {
   next();
 };
 
-const setRequestMeta = [setRequestCountry, setRealIp];
+const ping = chalk.bold.white("Ping!");
+const methods: { [key: string]: string } = {
+  GET: chalk.bold.green("GET"),
+  POST: chalk.bold.green("POST"),
+  DELETE: chalk.bold.red("DELETE"),
+  PUT: chalk.bold.yellow("PUT"),
+  PATCH: chalk.bold.yellow("PATCH")
+};
+const logRequest = (req: Request, res: Response, next: NextFunction) => {
+  res.on("finish", () => {
+    const output = [
+      ping,
+      methods[req.method],
+      req.realIp,
+      req.originalUrl,
+      "->",
+      colorizeHTTPCode(res.statusCode)
+    ];
+    console.log(output.join(" "));
+  });
+  next();
+};
 
-export { setRealIp };
+const setRequestMeta = [setRealIp, setRequestCountry];
+
+export { setRealIp, logRequest };
 export default setRequestMeta;

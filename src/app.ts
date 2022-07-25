@@ -8,6 +8,7 @@ import { verify } from "./auth/password";
 import baseRouter from "./routes";
 import errorHandler from "./middleware/error.middleware";
 import setRequestMeta from "./middleware/pre.middleware";
+import { logRequest } from "./middleware/pre.middleware";
 
 import "./auth/session";
 
@@ -28,6 +29,7 @@ app.use(express.urlencoded({ extended: true })); // Parse forms
 app.use(express.json()); // Parse JSON bodies
 app.use(cookieParser()); // Parse cookies
 app.use(cors()); // Allow all cross-origin requests
+app.use(logRequest);
 
 app.use(passport.initialize()); // Initialize Passport
 app.use(passport.session()); // Initialize Passport sessions
