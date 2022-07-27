@@ -1,5 +1,4 @@
-import { HydratedDocument } from "mongoose";
-import { UserType } from "./schemas/user.schema";
+import { User as APIUser } from "./schemas/user.schema";
 
 declare global {
   namespace Express {
@@ -8,7 +7,7 @@ declare global {
       country: string;
     }
 
-    interface User extends HydratedDocument<UserType> {}
+    interface User extends APIUser {}
   }
 
   namespace NodeJS {
