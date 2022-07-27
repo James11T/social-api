@@ -1,30 +1,29 @@
 import "dotenv/config";
-import mongoose from "mongoose";
 import ip from "ip";
 import chalk from "chalk";
 import app from "./app";
+import db from "./db";
 import { RUNTIME_CONSTANTS } from "./config";
 
-const { PORT, DB_URL } = process.env;
-
-if (RUNTIME_CONSTANTS.IS_DEV) {
-  console.log(`${chalk.blue("⚒")} Running in development mode`);
-}
-
-console.log(`${chalk.yellow("⧗")} Starting`);
-
+const { PORT } = process.env;
 const link = chalk.blue.underline;
-const success = chalk.green("✓");
-const fail = chalk.red("✗");
 
-mongoose.connect(DB_URL, (error) => {
-  const mongo = chalk.bold.green("MongoDB");
-  if (error) {
-    console.error(`${fail} Failed to connect to ${mongo}`, error);
-    return;
+const start = async () => {
+  console.log(`${chalk.yellow("⧗")} Starting`);
+
+  if (RUNTIME_CONSTANTS.IS_DEV)
+    console.log(`${chalk.blue("⚒")} Running in development mode`);
+
+  try {
+    db.authenticate();
+    console.log(`${chalk.green("✓")} Connected to database`);
+  } catch (error) {
+    console.log(`${chalk.red("✗")} Failed to connect to database`);
+    console.error(error);
+    process.exit(1);
   }
 
-  console.log(`${success} Connected to ${mongo}`);
+  db.sync({ force: true });
 
   app.listen(PORT, () => {
     const localAddr = `http://localhost:${PORT}/`;
@@ -36,4 +35,6 @@ mongoose.connect(DB_URL, (error) => {
     console.log(`   Connect locally with ${link(localAddr)}`);
     console.log(`   Or on another device with ${link(remoteAddr)}`);
   });
-});
+};
+
+start();

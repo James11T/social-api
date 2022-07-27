@@ -4,6 +4,7 @@ import parseDuration from "parse-duration";
 
 const { NODE_ENV, SEND_EMAILS_IN_DEV } = process.env;
 
+const isDevelopmentEnv = NODE_ENV.toUpperCase() === "DEVELOPMENT";
 const sendEmailsInDev = SEND_EMAILS_IN_DEV === "true";
 
 export interface PasswordRequirements {
@@ -36,8 +37,6 @@ export const USER_ID_CONSTANTS = {
   allowedChars: /[a-zA-Z0-9-_.]/g,
   matchRegex: /^(?=.{3,32}$)(?![_.-])(?!.*[_.-]{2})[a-zA-Z0-9._-]+([^._\s-])$/
 };
-
-const isDevelopmentEnv = NODE_ENV.toUpperCase() === "DEVELOPMENT";
 
 export const RUNTIME_CONSTANTS = {
   IS_DEV: isDevelopmentEnv,
