@@ -1,5 +1,6 @@
+import { APIParameterError } from "../errors/api";
 import { validationResult } from "express-validator";
-import { APIParameterError, BadParams } from "../errors/api";
+import type { BadParams } from "../errors/api";
 import type { Request, Response, NextFunction } from "express";
 
 const validateRequest = (req: Request, res: Response, next: NextFunction) => {
@@ -9,17 +10,12 @@ const validateRequest = (req: Request, res: Response, next: NextFunction) => {
 
     errors.array().forEach((error) => {
       badParams[error.param] = {
-        location: error.location,
+        location: error.location ?? "unknown",
         message: error.msg
       };
     });
 
-    return next(
-      new APIParameterError(
-        "One or more supplied parameters are invalid",
-        badParams
-      )
-    );
+    return next(new APIParameterError("One or more supplied parameters are invalid", badParams));
   }
 
   next();

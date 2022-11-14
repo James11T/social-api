@@ -3,76 +3,68 @@ import { RUNTIME_CONSTANTS } from "../config";
 class APIBaseError extends Error {
   status: number;
 
-  constructor(msg: string, status: number = 500) {
+  constructor(msg: string, status = 500) {
     super(msg);
 
     this.status = status;
   }
 
-  toJSON() {
+  toJSON(): any {
     return {
       error: this.message,
-      stack: RUNTIME_CONSTANTS.IS_DEV ? this.stack : undefined
+      stack: RUNTIME_CONSTANTS.IS_DEV && this.stack ? this.stack.split("\n").map((line) => line.trim()) : undefined
     };
   }
 }
 
 class APIBadRequestError extends APIBaseError {
-  constructor(msg: string = "Bad Request") {
+  constructor(msg = "Bad Request") {
     super(msg, 400);
   }
 }
 
 class APIUnauthorizedError extends APIBaseError {
-  constructor(msg: string = "Unauthorized") {
+  constructor(msg = "Unauthorized") {
     super(msg, 401);
   }
 }
 
 class APIForbiddenError extends APIBaseError {
-  constructor(msg: string = "Access Denied") {
+  constructor(msg = "Access Denied") {
     super(msg, 403);
   }
 }
 
 class APINotFoundError extends APIBaseError {
-  constructor(msg: string = "Not Found") {
+  constructor(msg = "Not Found") {
     super(msg, 404);
   }
 }
 
 class APIConflictError extends APIBaseError {
-  constructor(msg: string = "Conflict") {
+  constructor(msg = "Conflict") {
     super(msg, 409);
   }
 }
 
 class APIServerError extends APIBaseError {
-  constructor(msg: string = "Internal Server Error") {
+  constructor(msg = "Internal Server Error") {
     super(msg, 500);
   }
 }
 
-export interface BadParams {
-  [name: string]: {
-    location: string;
-    message: string;
-  };
-}
+export type BadParams = Record<string, { location: string; message: string }>;
 
 class APIParameterError extends APIBadRequestError {
   parameters: BadParams;
 
-  constructor(
-    msg: string = "One or more supplied parameters are invalid",
-    parameters: BadParams
-  ) {
+  constructor(msg = "One or more supplied parameters are invalid", parameters: BadParams) {
     super(msg);
 
     this.parameters = parameters;
   }
 
-  toJSON() {
+  toJSON(): any {
     return { ...super.toJSON(), parameters: this.parameters };
   }
 }

@@ -1,6 +1,7 @@
 import fs from "fs";
-import handlebars, { TemplateDelegate } from "handlebars";
-import { stripFileExtention } from "../utils/strings";
+import handlebars from "handlebars";
+import { stripFileExtension } from "../utils/strings";
+import type { TemplateDelegate } from "handlebars";
 import type { Attachment } from "nodemailer/lib/mailer";
 
 const NO_FALLBACK =
@@ -28,10 +29,7 @@ interface Templates {
 const loadFallback = (dirName: string) => {
   let fallback: string;
   try {
-    fallback = fs.readFileSync(
-      `${TEMPLATE_DIR}${dirName}/fallback.txt`,
-      "utf8"
-    );
+    fallback = fs.readFileSync(`${TEMPLATE_DIR}${dirName}/fallback.txt`, "utf8");
   } catch (error) {
     fallback = NO_FALLBACK;
   }
@@ -48,10 +46,7 @@ const loadFallback = (dirName: string) => {
  * @returns Template file render function with a list of attachments
  */
 const loadTemplate = (dirName: string): APITemplate => {
-  const template = fs.readFileSync(
-    `${TEMPLATE_DIR}${dirName}/template.hbs`,
-    "utf8"
-  );
+  const template = fs.readFileSync(`${TEMPLATE_DIR}${dirName}/template.hbs`, "utf8");
 
   const render = handlebars.compile(template);
   const fallback = loadFallback(dirName);
@@ -60,7 +55,7 @@ const loadTemplate = (dirName: string): APITemplate => {
     (file): Attachment => ({
       path: `${TEMPLATE_DIR}${dirName}/static/${file}`,
       filename: file,
-      cid: stripFileExtention(file)
+      cid: stripFileExtension(file)
     })
   );
 
@@ -78,9 +73,7 @@ const loadTemplates = () => {
   const templates: Templates = {};
 
   // Get all directory names in the template directory
-  const templateFolders = fs
-    .readdirSync(TEMPLATE_DIR, { withFileTypes: true })
-    .filter((path) => path.isDirectory());
+  const templateFolders = fs.readdirSync(TEMPLATE_DIR, { withFileTypes: true }).filter((path) => path.isDirectory());
 
   templateFolders.forEach((templateDir) => {
     try {

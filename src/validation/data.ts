@@ -1,9 +1,6 @@
 import isEmail from "validator/lib/isEmail";
-import {
-  PasswordRequirements,
-  PASSWORD_CONSTANTS,
-  USER_ID_CONSTANTS
-} from "../config";
+import { PASSWORD_CONSTANTS, USERNAME_CONSTANTS } from "../config";
+import type { PasswordRequirements } from "../config";
 
 /**
  * Check if a email is in valid format
@@ -19,23 +16,14 @@ const validateEmail = (email: string) => isEmail(email);
  * @param password A password to validate
  * @returns True if the password is valid
  */
-const validatePassword = (
-  password: string,
-  options: PasswordRequirements = {}
-) => {
-  const mergedOptions = { ...PASSWORD_CONSTANTS, ...options };
+const validatePassword = (password: string, options: Partial<PasswordRequirements> = {}) => {
+  const mergedOptions: PasswordRequirements = { ...PASSWORD_CONSTANTS, ...options };
 
   const metrics: boolean[] = [];
 
   metrics.push(password.length >= mergedOptions.minPasswordLength);
-
   metrics.push(password.length <= mergedOptions.maxPasswordLength);
-
-  metrics.push(
-    password.replace(mergedOptions.nonSpecialCharacters, "").length >=
-      mergedOptions.minSpecialCharacters
-  );
-
+  metrics.push(password.replace(mergedOptions.nonSpecialCharacters, "").length >= mergedOptions.minSpecialCharacters);
   metrics.push(password.replace(/\D/g, "").length >= mergedOptions.minNumbers);
 
   if (mergedOptions.mustVaryCase) {
@@ -57,7 +45,7 @@ const validatePassword = (
  */
 const validateUserId = (userId: string) => {
   if (!userId) return false;
-  return userId.match(USER_ID_CONSTANTS.matchRegex) !== null;
+  return userId.match(USERNAME_CONSTANTS.matchRegex) !== null;
   // TODO: Test
 };
 

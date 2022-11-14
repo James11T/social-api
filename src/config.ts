@@ -8,12 +8,12 @@ const isDevelopmentEnv = NODE_ENV.toUpperCase() === "DEVELOPMENT";
 const sendEmailsInDev = SEND_EMAILS_IN_DEV === "true";
 
 export interface PasswordRequirements {
-  minPasswordLength?: number;
-  maxPasswordLength?: number;
-  minSpecialCharacters?: number;
-  minNumbers?: number;
-  mustVaryCase?: boolean;
-  nonSpecialCharacters?: RegExp;
+  minPasswordLength: number;
+  maxPasswordLength: number;
+  minSpecialCharacters: number;
+  minNumbers: number;
+  mustVaryCase: boolean;
+  nonSpecialCharacters: RegExp;
 }
 
 export const HASHING_CONSTANTS = {
@@ -31,9 +31,9 @@ export const PASSWORD_CONSTANTS: PasswordRequirements = {
   nonSpecialCharacters: /[a-zA-Z0-9 ]/g
 };
 
-export const USER_ID_CONSTANTS = {
-  minUserIdLength: 3,
-  maxUserIdLength: 32,
+export const USERNAME_CONSTANTS = {
+  minUsernameLength: 3,
+  maxUsernameLength: 32,
   allowedChars: /[a-zA-Z0-9-_.]/g,
   matchRegex: /^(?=.{3,32}$)(?![_.-])(?!.*[_.-]{2})[a-zA-Z0-9._-]+([^._\s-])$/
 };
@@ -58,4 +58,16 @@ export const POST_CONSTANTS = {
   MAX_MEDIA_COUNT: 8,
   MAX_MEDIA_SIZE: bytes.parse("50MB"),
   ALLOWED_MEDIA_TYPES: ["image/jpeg", "image/png"]
+};
+
+export const REFRESH_TOKEN_CONSTANTS = {
+  TOKEN_TTL: parseDuration("60day", "ms")
+};
+
+export const ACCESS_TOKEN_CONSTANTS = {
+  TOKEN_TTL: parseDuration("1hr", "ms")
+};
+
+export const TOTP_CONSTANTS = {
+  SERVICE: "Kakapo"
 };

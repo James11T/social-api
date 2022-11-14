@@ -1,8 +1,8 @@
-import { alwaysArray } from "../utils/array";
-import { uploadFile } from "../aws/s3";
-import { uniqueString } from "../utils/strings";
-import { APIServerError } from "../errors/api";
+import { uuid } from "../utils/strings";
 import { WEB_CONSTANTS } from "../config";
+import { uploadFile } from "../services/s3";
+import { alwaysArray } from "../utils/array";
+import { APIBadRequestError, APIServerError } from "../errors/api";
 import type { NextFunction, Request, Response } from "express";
 
 const { WEB_DOMAIN } = process.env;
@@ -23,13 +23,11 @@ const queryPostsController = async (req: Request, res: Response) => {
  * @param req Express request object
  * @param res Express response object
  */
-const createPostController = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const createPostController = async (req: Request, res: Response, next: NextFunction) => {
+  if (!req.files) return next(new APIBadRequestError("No files submitted"));
+
   const files = alwaysArray(req.files.media);
-  const postId = uniqueString();
+  const postId = uuid();
 
   let uploads;
   try {
@@ -80,10 +78,4 @@ const editPostController = async (req: Request, res: Response) => {
   // TODO: Implement
 }; // PATCH
 
-export {
-  queryPostsController,
-  createPostController,
-  getPostController,
-  deletePostController,
-  editPostController
-};
+export { queryPostsController, createPostController, getPostController, deletePostController, editPostController };

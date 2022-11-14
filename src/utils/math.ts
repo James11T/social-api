@@ -12,7 +12,6 @@
  * @param max The maximum value
  * @returns Value clamped between min and max
  */
-const clamp = (value: number, min: number, max: number) =>
-  Math.min(Math.max(value, min), max);
+const clamp = (value: number, min: number, max: number): number => Math.min(Math.max(value, min), max);
 
 export { clamp };

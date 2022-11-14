@@ -1,13 +1,12 @@
-import { User as APIUser } from "./schemas/user.schema";
+import type { User } from "./models";
 
 declare global {
   namespace Express {
     interface Request {
       realIp: string;
       country: string;
+      user?: User;
     }
-
-    interface User extends APIUser {}
   }
 
   namespace NodeJS {
@@ -16,6 +15,9 @@ declare global {
       DB_URL: string;
       NODE_ENV: string;
       SEND_EMAILS_IN_DEV: string;
+      JWT_SECRET: string;
+      AWS_ACCESS_KEY_ID: string;
+      AWS_SECRET_ACCESS_KEY: string;
     }
   }
 }

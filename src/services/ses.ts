@@ -1,11 +1,10 @@
 import nodemailer from "nodemailer";
-import AWS from "aws-sdk";
-import templates from "./templates";
+import * as AWS from "@aws-sdk/client-ses";
+import templates from "../email/templates";
 import { RUNTIME_CONSTANTS, WEB_CONSTANTS } from "../config";
 import type { Attachment } from "nodemailer/lib/mailer";
 
-const { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, WEB_DOMAIN } =
-  process.env;
+const { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, WEB_DOMAIN } = process.env;
 
 const SES_CONFIG = {
   accessKeyId: AWS_ACCESS_KEY_ID,
@@ -14,17 +13,17 @@ const SES_CONFIG = {
   sslEnabled: true
 };
 
-const ses = new AWS.SES(SES_CONFIG);
+const ses = new AWS.SESClient(SES_CONFIG);
 
-let transporter = nodemailer.createTransport({
+const transporter = nodemailer.createTransport({
   SES: { ses, AWS },
   sendingRate: 1
 });
 
 interface EmailOptions {
-  name?: string;
-  user?: string;
-  subject?: string;
+  name: string;
+  user: string;
+  subject: string;
   text?: string;
   html?: string;
   attachments?: Attachment[];
@@ -42,21 +41,21 @@ const defaultOptions: EmailOptions = {
  * @param to Email recipient(s)
  * @param options Additional email options
  */
-const sendEmail = async (to: string | string[], options: EmailOptions) => {
+const sendEmail = async (to: string | string[], options: Partial<EmailOptions>) => {
   if (!RUNTIME_CONSTANTS.CAN_SEND_EMAILS) return;
 
-  options = { ...defaultOptions, ...options };
+  const combinedOptions = { ...defaultOptions, ...options };
 
   await transporter.sendMail({
     from: {
-      name: options.name,
-      address: `${options.user}@${WEB_CONSTANTS.MAIL_SUBDOMAIN}.${WEB_DOMAIN}`
+      name: combinedOptions.name,
+      address: `${combinedOptions.user}@${WEB_CONSTANTS.MAIL_SUBDOMAIN}.${WEB_DOMAIN}`
     },
     to,
-    subject: options.subject,
-    text: options.text,
-    html: options.html,
-    attachments: options.attachments
+    subject: combinedOptions.subject,
+    text: combinedOptions.text,
+    html: combinedOptions.html,
+    attachments: combinedOptions.attachments
   });
 
   // TODO: Test
@@ -66,17 +65,17 @@ const sendEmail = async (to: string | string[], options: EmailOptions) => {
  * Render from a template and send an email
  *
  * @param to Email recipient(s)
- * @param template Email template name
+ * @param templateName Email template name
  * @param templateContext Context to pass to the template
  * @param options Additional email options
  */
 const sendTemplate = async (
   to: string | string[],
-  template: string,
+  templateName: string,
   templateContext: any,
-  options: EmailOptions
+  options: Partial<EmailOptions>
 ) => {
-  const loadedTemplate = templates[template];
+  const loadedTemplate = templates[templateName];
   const html = loadedTemplate.render(templateContext);
   const text = loadedTemplate.fallback(templateContext);
 
@@ -84,7 +83,7 @@ const sendTemplate = async (
     ...options,
     html,
     text,
-    attachments: templates[template].assets
+    attachments: templates[templateName].assets
   });
 
   // TODO: Test

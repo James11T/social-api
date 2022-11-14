@@ -1,6 +1,6 @@
-import express, { NextFunction } from "express";
 import { RUNTIME_CONSTANTS } from "../config";
-import { getMemeoryUsage } from "../utils/process";
+import { getMemoryUsage } from "../utils/process";
+import type { Request, Response, NextFunction } from "express";
 
 /**
  * Responds with pong if API is alive
@@ -8,16 +8,12 @@ import { getMemeoryUsage } from "../utils/process";
  * @param req Express request object
  * @param res Express response object
  */
-const pingController = async (
-  req: express.Request,
-  res: express.Response,
-  next: NextFunction
-) => {
+const pingController = async (req: Request, res: Response, next: NextFunction) => {
   return res.json({
     status: "ONLINE",
-    version: "1.0.0",
+    version: process.env.npm_package_version ?? "UNKNOWN",
     country: req.country,
-    memoryUsage: RUNTIME_CONSTANTS.IS_DEV ? getMemeoryUsage() : undefined
+    memoryUsage: RUNTIME_CONSTANTS.IS_DEV ? getMemoryUsage() : undefined
   });
 };
 

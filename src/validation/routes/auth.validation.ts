@@ -5,22 +5,22 @@ import validateRequest from "../../middleware/validation.middleware";
 const passwordErrorMessage =
   "Password must be greater than 8 characters long and meet the minimum password requirements";
 
-const passwordVerifer = (password: string) => validatePassword(password);
+const passwordVerifier = (password: string) => validatePassword(password);
 
-export const validateSignIn = [
-  body("userId").exists().withMessage("User ID must be supplied"),
+const validateSignIn = [
+  body("email").exists().withMessage("Email must be supplied"),
   body("password").notEmpty().withMessage("Password cannot be empty"),
-  body("otp").optional().isNumeric().withMessage("OTP is in invalid format"),
+  body("totp").optional().isNumeric().isLength({ min: 6, max: 6 }).withMessage("TOTP is in invalid format"),
   validateRequest
 ];
 
-export const validateSignUp = [
-  body("userId")
+const validateSignUp = [
+  body("username")
     .notEmpty()
-    .withMessage("User ID cannot be empty")
+    .withMessage("Username cannot be empty")
     .custom(validateUserId)
     .withMessage(
-      "User ID must be between 3 and 32 characters long and not contain spaces or repeated and trailing ._-"
+      "Username must be between 3 and 32 characters long and not contain spaces or repeated and trailing ._-"
     ),
   body("email")
     .notEmpty()
@@ -30,33 +30,32 @@ export const validateSignUp = [
   body("password")
     .notEmpty()
     .withMessage("Password cannot be empty")
-    .custom(passwordVerifer)
+    .custom(passwordVerifier)
     .withMessage(passwordErrorMessage),
   validateRequest
 ];
 
-export const validateForgotPassword = [
-  param("userId").exists().notEmpty(),
-  validateRequest
-];
+const validateForgotPassword = [param("email").exists().notEmpty(), validateRequest];
 
-export const validateChangePassword = [
-  body("userId").notEmpty(),
+const validateChangePassword = [
+  body("email").notEmpty(),
   body("password")
     .notEmpty()
     .withMessage("Password cannot be empty")
-    .custom(passwordVerifer)
+    .custom(passwordVerifier)
     .withMessage(passwordErrorMessage),
   body("resetToken").notEmpty().withMessage("Reset token is required"),
   validateRequest
 ];
 
-export const validateOtp = [
-  body("otp")
+const validateTotp = [
+  body("totp")
     .notEmpty()
-    .withMessage("OTP is required")
+    .withMessage("TOTP is required")
     .isNumeric()
     .isLength({ min: 6, max: 6 })
-    .withMessage("OTP must be 6 numbers"),
+    .withMessage("TOTP must be 6 numbers"),
   validateRequest
 ];
+
+export { validateSignIn, validateSignUp, validateForgotPassword, validateChangePassword, validateTotp };

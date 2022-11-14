@@ -1,6 +1,6 @@
 /**
  * Coerce a value to an array.
- * Gaurantees that the result is an array.
+ * Guarantees that the result is an array.
  *
  * @param value Any input, array, single or nullish
  * @returns An array that either is the input, or contains the input

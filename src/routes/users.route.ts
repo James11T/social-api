@@ -5,29 +5,30 @@ import {
   getFriendRequestsController,
   sendFriendRequestsController,
   getUserFriendsController,
-  isUserIdAvailabileController
+  isUsernameTakenController,
+  create2FA,
+  disable2FA,
+  activate2FA
 } from "../controllers/users.controller";
 import { protect } from "../middleware/auth.middleware";
 import { validateUserQuery } from "../validation/routes/users.validation";
+import { validateChangePassword, validateTotp } from "../validation/routes/auth.validation";
 
 const usersRouter = Router(); // /users
 
 usersRouter.get("/", validateUserQuery, filterUserController);
-usersRouter.get("/:userId", getUserController);
+usersRouter.get("/:id", getUserController);
 
-usersRouter.get("/:userId/friends", getUserFriendsController);
+usersRouter.get("/:id/username-taken", isUsernameTakenController);
 
-usersRouter.get("/:userId/idavailable", isUserIdAvailabileController);
+usersRouter.get("/:id/friends", getUserFriendsController);
+usersRouter.get("/:id/friends-requests", protect, getFriendRequestsController);
+usersRouter.post("/:id/friends-requests", protect, sendFriendRequestsController);
 
-usersRouter.get(
-  "/:userId/friends/requests",
-  protect,
-  getFriendRequestsController
-);
-usersRouter.post(
-  "/:userId/friends/request",
-  protect,
-  sendFriendRequestsController
-);
+// usersRouter.post("/:id/change-password", validateChangePassword, changePasswordController);
+
+usersRouter.post("/:id/2fa/create", protect, create2FA);
+usersRouter.post("/:id/2fa/activate", protect, validateTotp, activate2FA);
+usersRouter.post("/:id/2fa/disable", protect, validateTotp, disable2FA);
 
 export default usersRouter;

@@ -1,33 +1,26 @@
-import { APIUnauthorizedError, APIServerError } from "../errors/api";
-import passport from "passport";
+import { User } from "../models";
+import { decodeSignedToken } from "../utils/jwt";
+import { APIUnauthorizedError } from "../errors/api";
+import type { JWTAccessToken } from "../types";
 import type { Request, Response, NextFunction } from "express";
 
-const authenticate =
-  (strategy: string = "local") =>
-  (req: Request, res: Response, next: NextFunction) => {
-    passport.authenticate(strategy, (err, user, info) => {
-      if (err) return next(err);
-      if (!user) return next(new APIUnauthorizedError(info.message));
+const authenticate = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  const accessToken = req.headers.authorization;
+  if (!accessToken) return next();
 
-      req.login(user, (loginError) => {
-        if (loginError)
-          return next(new APIServerError("Failed to authenticate"));
-      });
+  const decoded = decodeSignedToken<JWTAccessToken>(accessToken);
+  if (decoded.err) return next(new APIUnauthorizedError("Bad access token"));
 
-      req.user = user;
-      next();
-    })(req, res, next);
-  }; // TODO: Test
+  const user = await User.findOne({ where: { id: decoded.val.sub } });
+  if (!user) return next(new APIUnauthorizedError("Failed to access token subject user"));
 
-const protect = async (req: Request, res: Response, next: NextFunction) => {
-  if (!req.user)
-    return next(
-      new APIUnauthorizedError(
-        "You must be authenticated to access this resource."
-      )
-    );
-
+  req.user = user;
   next();
+};
+
+const protect = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  next();
+  // TODO: DO
   // TODO: Test
 };
 

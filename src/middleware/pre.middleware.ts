@@ -1,21 +1,14 @@
-import geoip from "geoip-country";
 import chalk from "chalk";
+import geoip from "geoip-country";
 import { colorizeHTTPCode } from "../utils/strings";
 import type { Request, Response, NextFunction } from "express";
 
 const FAIL_COUNTRY_CODE = "ZZ";
 
 const setRealIp = (req: Request, res: Response, next: NextFunction) => {
-  let ip = req.ip;
+  let ip = req.header("x-real-ip") ?? req.header("cf-connecting-ip") ?? req.header("x-forwarded-for");
 
-  ip = String(
-    req.header("x-real-ip") ?? // Universal header for real IP
-      req.header("cf-connecting-ip") ?? // Cloudflare
-      req.header("x-forwarded-for") ?? // Universal
-      ip // Fallback to IP, likely local connection
-  );
-
-  req.realIp = ip;
+  req.realIp = ip ?? req.ip;
   next();
 };
 
@@ -51,14 +44,7 @@ const methods: { [key: string]: string } = {
 };
 const logRequest = (req: Request, res: Response, next: NextFunction) => {
   res.on("finish", () => {
-    const output = [
-      ping,
-      methods[req.method],
-      req.realIp,
-      req.originalUrl,
-      "->",
-      colorizeHTTPCode(res.statusCode)
-    ];
+    const output = [ping, methods[req.method], req.realIp, req.originalUrl, "->", colorizeHTTPCode(res.statusCode)];
     console.log(output.join(" "));
   });
   next();

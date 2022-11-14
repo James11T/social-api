@@ -1,7 +1,10 @@
-import speakeasy from "speakeasy";
 import qr from "qrcode";
 import jwt from "jsonwebtoken";
-import { userModel, isUserIDTaken, UserType } from "../schemas/user.schema";
+import { User, UserTOTP } from "../models";
+import { signToken } from "../utils/jwt";
+import { sendTemplate } from "../services/ses";
+import { generateRefreshToken } from "../auth/tokens";
+import { countryCodeEmoji } from "country-code-emoji";
 import {
   APIBadRequestError,
   APIConflictError,
@@ -9,36 +12,58 @@ import {
   APIServerError,
   APIUnauthorizedError
 } from "../errors/api";
-import { hashPassword, invokePasswordReset } from "../auth/password";
 import { getVerificationToken } from "../email/verification";
-import { sendTemplate } from "../email/transporter";
-import { WEB_CONSTANTS, RUNTIME_CONSTANTS } from "../config";
-import { verifyOTP } from "../auth/otp";
-import { countryCodeEmoji } from "country-code-emoji";
+import { WEB_CONSTANTS, RUNTIME_CONSTANTS, TOTP_CONSTANTS } from "../config";
+import { hashPassword, invokePasswordReset, verifyPassword } from "../auth/password";
 import type { NextFunction, Request, Response } from "express";
-import type { ChangePasswordToken } from "../auth/password";
+import { authenticator } from "otplib";
 
 const { JWT_SECRET } = process.env;
 
+interface SignInBody {
+  email: string;
+  password: string;
+}
+
 /**
- * Authenticate a user with their email and password
+ * Authenticate a user with their email and password and return a refresh token
  *
- * @param req Express request object
- * @param res Express response object
+ * Methods: POST
+ *
  */
-const signInController = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  // If the controller is reached then passport succeeded
-  return res.json({ success: true, user: { userId: req.user.userId } });
+const signInController = async (req: Request<unknown, unknown, SignInBody>, res: Response, next: NextFunction) => {
+  const user = await User.findOne({ where: { email: req.body.email } });
+
+  const failError = new APINotFoundError("No user with the given email exists.");
+
+  if (!user) return next(failError);
+
+  const passwordsMatch = await verifyPassword(req.body.password, user.passwordHash);
+  if (!passwordsMatch) return next(failError);
+
+  const [refreshToken] = await generateRefreshToken(user, "auth");
+  const signedToken = await signToken(refreshToken);
+
+  if (signedToken.err) {
+    if (signedToken.val === "SIGN_TOKEN_ERROR") {
+      return next(new APIServerError("Failed to start new user session"));
+    }
+  }
+
+  return res.json({
+    success: true,
+    refreshToken: signedToken.val,
+    user: {
+      email: user.email,
+      username: user.username
+    }
+  });
 
   // TODO: Test
 }; // POST
 
 interface SignUpBody {
-  userId: string;
+  username: string;
   email: string;
   password: string;
 }
@@ -46,51 +71,44 @@ interface SignUpBody {
 /**
  * Create a new user from the request body
  *
- * @param req Express request object
- * @param res Express response object
+ * Methods: POST
  */
-const signUpController = async (
-  req: Request<unknown, unknown, SignUpBody>,
-  res: Response,
-  next: NextFunction
-) => {
-  if (req.user) return next(new APIBadRequestError("Already signed in"));
+const signUpController = async (req: Request<unknown, unknown, SignUpBody>, res: Response, next: NextFunction) => {
+  if (req.user) return next(new APIBadRequestError("Cannot sign up while authenticated"));
 
-  const { userId, email, password } = req.body;
+  const { username, email, password } = req.body;
 
   let isTaken: boolean;
   try {
-    isTaken = await isUserIDTaken(userId);
+    const getUsername = await User.fromUsername(username);
+    if (getUsername.err) {
+      if (getUsername.val === "FAILED_TO_FETCH_USER") {
+        return next(new APIServerError("Failed to check username availability"));
+      }
+    }
+    isTaken = getUsername !== null;
   } catch {
     return next(new APIServerError("Failed to check user ID"));
   }
 
-  if (isTaken)
-    return next(new APIConflictError("User ID is taken or reserved."));
+  if (isTaken) return next(new APIConflictError("User ID is taken or reserved"));
 
-  let passwordHash;
-  try {
-    passwordHash = await hashPassword(password);
-  } catch {
+  const passwordHash = await hashPassword(password);
+  if (passwordHash.err) {
     return next(new APIServerError("Failed to hash password"));
   }
 
   const verificationToken = getVerificationToken();
 
-  const user: UserType = {
-    userId,
-    passwordHash,
-    email: {
-      value: email,
-      token: verificationToken
-    }
-  };
+  const newUser = new User();
+  newUser.username = username;
+  newUser.email = email;
+  newUser.registeredAt = new Date();
+  newUser.passwordHash = passwordHash.val;
 
-  const newUser = new userModel(user);
+  const saveResult = await newUser.saveProxy();
 
-  try {
-    await newUser.save();
-  } catch {
+  if (saveResult.err) {
     return next(new APIServerError("Failed to create user"));
   }
 
@@ -99,7 +117,7 @@ const signUpController = async (
       email,
       "confirmEmail",
       {
-        name: userId,
+        name: username,
         link: `${WEB_CONSTANTS.URL}email/verify?c=${verificationToken}`
       },
       { subject: "Confirm your email" }
@@ -114,43 +132,22 @@ const signUpController = async (
 }; // POST
 
 /**
- * Clear the authentication cookie
- *
- * @param req Express request object
- * @param res Express response object
- */
-const deauthController = async (req: Request, res: Response) => {
-  req.logout();
-  res.send({ success: true });
-
-  // TODO: Test
-}; // GET
-
-/**
  * Trigger a password reset
  *
  * @param req Express request object
  * @param res Express response object
  */
-const forgotPasswordController = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const { userId } = req.params;
+const forgotPasswordController = async (req: Request, res: Response, next: NextFunction) => {
+  const { id } = req.params;
 
-  let user;
+  const user = await User.fromId(id);
+
+  if (user.err) return next(new APIServerError("Failed to fetch user"));
+  if (!user.val) return next(new APINotFoundError("User does not exist"));
+
+  let token: string;
   try {
-    user = await userModel.findOne({ userId });
-  } catch (err) {
-    return next(new APIServerError("Failed to check user"));
-  }
-
-  if (!user) return next(new APINotFoundError("User does not exist"));
-
-  let token;
-  try {
-    token = await invokePasswordReset(user);
+    token = await invokePasswordReset(user.val); // TODO: Update
   } catch (err) {
     return next(new APIServerError("Failed to send password reset email"));
   }
@@ -163,170 +160,10 @@ const forgotPasswordController = async (
   // TODO: Test
 }; // GET
 
-interface OTPBody {
-  otp: string;
-}
-
-/**
- * Used to generate a 2FA secret and set the OTP status to pending
- *
- * @param req Express request object
- * @param res Express response object
- */
-const enable2FA = async (req: Request, res: Response, next: NextFunction) => {
-  if (req.user.otp.status === "enabled")
-    return next(new APIBadRequestError("2FA is already enabled"));
-
-  const secret = speakeasy.generateSecret({
-    name: `Kakapo (${req.user.userId})`
-  });
-
-  try {
-    await req.user.updateOne({
-      otp: { status: "pending", secret: secret.base32, enabledAt: new Date() }
-    });
-  } catch (err) {
-    return next(new APIServerError("Failed to enable 2FA"));
-  }
-
-  let userQR: string;
-  try {
-    userQR = await qr.toDataURL(secret.otpauth_url, { margin: 2 });
-  } catch (err) {
-    return next(new APIServerError("Failed to generate 2FA QR code"));
-  }
-
-  return res.json({ qr: userQR });
-  // TODO: Test
-}; // GET
-
-/**
- * Used to verify 2FA secret and set the OTP status to enabled
- *
- * @param req Express request object
- * @param res Express response object
- */
-const activate2FA = async (
-  req: Request<unknown, unknown, OTPBody>,
-  res: Response,
-  next: NextFunction
-) => {
-  if (!req.user) return next(new APIUnauthorizedError("Not signed in"));
-
-  if (req.user.otp.status === "disabled") {
-    return next(new APIBadRequestError("2FA is not pending"));
-  } else if (req.user.otp.status === "enabled") {
-    return next(new APIBadRequestError("2FA is already enabled"));
-  }
-
-  const { otp } = req.body;
-
-  let isOTPValid: boolean;
-  try {
-    isOTPValid = verifyOTP(req.user, otp);
-  } catch (err) {
-    return next(new APIServerError("Failed to verify OTP"));
-  }
-
-  if (!isOTPValid) return next(new APIUnauthorizedError("Invalid OTP"));
-
-  try {
-    await req.user.updateOne({
-      otp: {
-        status: "enabled",
-        enabledAt: new Date(),
-        secret: req.user.otp.secret
-      }
-    });
-  } catch {
-    return next(new APIServerError("Failed to activate 2FA"));
-  }
-
-  try {
-    await sendTemplate(
-      req.user.email.value,
-      "2FAEnabled",
-      {
-        name: req.user.userId,
-        request: {
-          ip: req.realIp,
-          flag: countryCodeEmoji(req.country)
-        }
-      },
-      { subject: "2FA Enabled" }
-    );
-  } catch {}
-
-  return res.json({ success: true });
-
-  // TODO: Test
-}; // POST
-
-/**
- * Used to verify 2FA secret and set the OTP status to enabled
- *
- * @param req Express request object
- * @param res Express response object
- */
-const disable2FA = async (
-  req: Request<unknown, unknown, OTPBody>,
-  res: Response,
-  next: NextFunction
-) => {
-  if (req.user.otp.status === "disabled") {
-    return next(new APIBadRequestError("2FA is not enabled"));
-  }
-
-  const { otp } = req.body;
-
-  let isOTPValid: boolean;
-  try {
-    isOTPValid = verifyOTP(req.user, otp);
-  } catch (err) {
-    return next(new APIServerError("Failed to verify OTP"));
-  }
-
-  if (!isOTPValid) return next(new APIUnauthorizedError("Invalid OTP"));
-
-  try {
-    await req.user.updateOne({
-      otp: { status: "disabled", enabledAt: null, secret: "" }
-    });
-  } catch {
-    return next(new APIServerError("Failed to disable 2FA"));
-  }
-
-  try {
-    await sendTemplate(
-      req.user.email.value,
-      "2FADisabled",
-      {
-        name: req.user.userId,
-        request: {
-          ip: req.realIp,
-          flag: countryCodeEmoji(req.country)
-        }
-      },
-      { subject: "2FA Disabled" }
-    );
-  } catch {}
-
-  return res.json({ success: true });
-
-  // TODO: Test
-}; // POST
-
 /**
  * Return the current user
- *
- * @param req Express request object
- * @param res Express response object
  */
-const whoAmIController = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const whoAmIController = async (req: Request, res: Response, next: NextFunction) => {
   if (!req.user) {
     return res.json({ user: null });
   }
@@ -336,72 +173,4 @@ const whoAmIController = async (
   // TODO: Test
 };
 
-const changePasswordController = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const { resetToken, userId, password } = req.body;
-
-  let user;
-  try {
-    user = await userModel.findOne({ userId });
-  } catch (err) {
-    return next(new APIServerError("Failed to check authorisation"));
-  }
-
-  let tokenData: ChangePasswordToken;
-  try {
-    tokenData = jwt.verify(resetToken, JWT_SECRET) as ChangePasswordToken;
-  } catch (err) {
-    return next(new APIBadRequestError("Invalid JWT"));
-  }
-
-  const dbToken = user.resetTokens.find((t) => t.token === tokenData.token);
-
-  if (!dbToken) {
-    return next(new APIBadRequestError("Invalid token"));
-  }
-
-  if (dbToken.expires < new Date()) {
-    return next(new APIBadRequestError("Token has expired"));
-  }
-
-  let passwordHash;
-  try {
-    passwordHash = await hashPassword(password);
-  } catch {
-    return next(new APIServerError("Failed to hash password"));
-  }
-
-  try {
-    await user.updateOne({
-      passwordHash,
-      $pull: {
-        resetTokens: { token: tokenData.token }
-      }
-    });
-  } catch (err) {
-    console.error(err);
-    return next(new APIServerError("Failed to update password"));
-  }
-
-  return res.json({ success: true });
-}; // POST
-
-const get2FAStatus = (req: Request, res: Response, next: NextFunction) => {
-  return res.json({ status: req.user.otp.status });
-};
-
-export {
-  signInController,
-  signUpController,
-  deauthController,
-  forgotPasswordController,
-  whoAmIController,
-  enable2FA,
-  activate2FA,
-  disable2FA,
-  get2FAStatus,
-  changePasswordController
-};
+export { signInController, signUpController, forgotPasswordController, whoAmIController };
