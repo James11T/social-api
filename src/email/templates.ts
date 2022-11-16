@@ -1,6 +1,5 @@
 import fs from "fs";
 import handlebars from "handlebars";
-import { stripFileExtension } from "../utils/strings";
 import type { TemplateDelegate } from "handlebars";
 
 const NO_FALLBACK =
@@ -16,6 +15,8 @@ interface APITemplate {
 interface Templates {
   [key: string]: APITemplate;
 }
+
+handlebars.registerPartial("base", handlebars.compile(fs.readFileSync(`${TEMPLATE_DIR}base.hbs`, "utf8")));
 
 /**
  * Load the text fallback for a HTML email template
@@ -85,6 +86,3 @@ export default templates;
 
 // I never want to in my life ever have to make HTML emails ever again.
 // LATO and Raleway
-
-// CID to FILE: /"cid:(.+?)"/ -> "static/$1.png"
-// FILE to CID: static\/(.+?)\.png -> "cid:$1"
