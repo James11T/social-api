@@ -1,131 +1,20 @@
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="Content-Type" content="text/html charset=UTF-8" />
-    <title>2FA Disabled</title>
-  </head>
-  <body
-    style="
-      font-family: Arial, Helvetica, sans-serif;
-      margin: 0;
-      color: rgb(68, 68, 68);
-      background-color: #cccccc;
-    "
-  >
-    <center style="width: 100%; table-layout: fixed; background-color: #cccccc">
-      <table
-        width="100%"
-        style="
-          margin: 0 auto;
-          width: 100%;
-          max-width: 600px;
-          border-spacing: 0;
-          background-color: white;
-        "
-      >
-        <tr>
-          <td height="15" style="padding: 0; background-color: white"></td>
-        </tr>
-        <tr>
-          <td style="padding: 0">
-            <center>
-              <a href="https://kakaposocial.com/" style="text-decoration: none">
-                <img src="cid:banner" alt="Kakapo Branding" height="35" />
-              </a>
-            </center>
-          </td>
-        </tr>
-        <tr>
-          <td height="15" style="padding: 0; background-color: white"></td>
-        </tr>
-
-        <tr>
-          <td height="2" style="padding: 0; background-color: #eeeeee"></td>
-        </tr>
-        <tr>
-          <td height="15" style="padding: 0; background-color: white"></td>
-        </tr>
-        <tr>
-          <td style="padding: 0; background-color: white; padding: 0 10px">
-            <h3 style="margin: 0; font-weight: 500">Hello {{name}}!</h3>
-            <p style="margin: 0; font-weight: lighter">
-              We're just emailing you to let you know that 2FA was recently
-              disabled on your account.
-            </p>
-            <p>
-              If this was not you then you should change your password
-              immediately.
-            </p>
-          </td>
-        </tr>
-
-        <tr>
-          <td height="20" style="padding: 0; background-color: white"></td>
-        </tr>
-
-        <tr>
-          <td height="15" style="padding: 0; background-color: #ebebeb"></td>
-        </tr>
-
-        <tr>
-          <td style="padding: 0; background-color: #ebebeb">
-            <center>
-              <img src="cid:shadowlogo" alt="Kakapo Logo" width="110" />
-            </center>
-          </td>
-        </tr>
-        <tr>
-          <td height="15" style="padding: 0; background-color: #ebebeb"></td>
-        </tr>
-        <tr>
-          <td style="padding: 0; background-color: #ebebeb" class="footer">
-            <center>
-              <a
-                href="#"
-                style="margin: 0 10px; display: block; color: #aaaaaa"
-              >Why am I reveiving this email?</a>
-            </center>
-          </td>
-        </tr>
-        <tr>
-          <td height="10" style="padding: 0; background-color: #ebebeb"></td>
-        </tr>
-        <tr>
-          <td style="padding: 0; background-color: #ebebeb" class="footer">
-            <center>
-              <a
-                href="#"
-                style="margin: 0 10px; display: block; color: #aaaaaa"
-              >Unsubscribe / Stop receiving emails.</a>
-            </center>
-          </td>
-        </tr>
-        <tr>
-          <td height="20" style="padding: 0; background-color: #ebebeb"></td>
-        </tr>
-        <tr>
-          <td height="5" style="padding: 0; background-color: #e7e7e7"></td>
-        </tr>
-        <tr>
-          <td
-            style="
-              padding: 0;
-              background-color: #e7e7e7;
-              color: #777777;
-              padding-left: 8px;
-            "
-          >
-            Request originated from
-            {{request.flag}}
-            {{request.ip}}
-          </td>
-        </tr>
-        <tr>
-          <td height="5" style="padding: 0; background-color: #e7e7e7"></td>
-        </tr>
-      </table>
-    </center>
-  </body>
-</html>
+{{#> base }}
+<tr>
+  <td style="padding: 0; padding: 0 10px">
+    <h3 style="margin: 0; font-weight: 500">Hello {{name}}!</h3>
+  </td>
+</tr>
+<tr>
+  <td height="10" style="padding: 0; background-color: white"></td>
+</tr>
+<tr>
+  <td style="padding: 0; background-color: white; padding: 0 10px">
+    <p style="margin: 0; font-weight: lighter">
+      We're just emailing you to let you know that 2FA was recently disabled on your account.
+    </p>
+    <p>
+      If this was not you then you should change your password immediately.
+    </p>
+  </td>
+</tr>
+{{/ base }}

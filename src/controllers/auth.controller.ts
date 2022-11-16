@@ -78,20 +78,10 @@ const signUpController = async (req: Request<unknown, unknown, SignUpBody>, res:
 
   const { username, email, password } = req.body;
 
-  let isTaken: boolean;
-  try {
-    const getUsername = await User.fromUsername(username);
-    if (getUsername.err) {
-      if (getUsername.val === "FAILED_TO_FETCH_USER") {
-        return next(new APIServerError("Failed to check username availability"));
-      }
-    }
-    isTaken = getUsername !== null;
-  } catch {
-    return next(new APIServerError("Failed to check user ID"));
-  }
+  const getUsername = await User.fromUsername(username);
+  if (getUsername.err) return next(new APIServerError("Failed to check username availability"));
 
-  if (isTaken) return next(new APIConflictError("User ID is taken or reserved"));
+  if (getUsername.val) return next(new APIConflictError("User ID is taken or reserved"));
 
   const passwordHash = await hashPassword(password);
   if (passwordHash.err) {

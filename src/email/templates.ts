@@ -2,7 +2,6 @@ import fs from "fs";
 import handlebars from "handlebars";
 import { stripFileExtension } from "../utils/strings";
 import type { TemplateDelegate } from "handlebars";
-import type { Attachment } from "nodemailer/lib/mailer";
 
 const NO_FALLBACK =
   "This email is HTML only. If you can't see the HTML version of this email then you may need to update your email client preferences.";
@@ -12,7 +11,6 @@ const TEMPLATE_DIR = "src/views/";
 interface APITemplate {
   render: TemplateDelegate;
   fallback: TemplateDelegate;
-  assets: Attachment[];
 }
 
 interface Templates {
@@ -51,15 +49,7 @@ const loadTemplate = (dirName: string): APITemplate => {
   const render = handlebars.compile(template);
   const fallback = loadFallback(dirName);
 
-  const assets = fs.readdirSync(`${TEMPLATE_DIR}${dirName}/static`).map(
-    (file): Attachment => ({
-      path: `${TEMPLATE_DIR}${dirName}/static/${file}`,
-      filename: file,
-      cid: stripFileExtension(file)
-    })
-  );
-
-  return { render, fallback, assets };
+  return { render, fallback };
 
   // TODO: Test
 };

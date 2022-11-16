@@ -1,22 +1,21 @@
 import nodemailer from "nodemailer";
-import * as AWS from "@aws-sdk/client-ses";
+import AWS from "aws-sdk";
 import templates from "../email/templates";
 import { RUNTIME_CONSTANTS, WEB_CONSTANTS } from "../config";
 import type { Attachment } from "nodemailer/lib/mailer";
 
 const { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, WEB_DOMAIN } = process.env;
 
-const SES_CONFIG = {
+AWS.config.update({
   accessKeyId: AWS_ACCESS_KEY_ID,
   secretAccessKey: AWS_SECRET_ACCESS_KEY,
-  region: AWS_REGION,
-  sslEnabled: true
-};
+  region: AWS_REGION
+});
 
-const ses = new AWS.SESClient(SES_CONFIG);
+const ses = new AWS.SES({ apiVersion: "latest", sslEnabled: true });
 
 const transporter = nodemailer.createTransport({
-  SES: { ses, AWS },
+  SES: ses,
   sendingRate: 1
 });
 
@@ -44,7 +43,7 @@ const defaultOptions: EmailOptions = {
 const sendEmail = async (to: string | string[], options: Partial<EmailOptions>) => {
   if (!RUNTIME_CONSTANTS.CAN_SEND_EMAILS) return;
 
-  const combinedOptions = { ...defaultOptions, ...options };
+  const combinedOptions: EmailOptions = { ...defaultOptions, ...options };
 
   await transporter.sendMail({
     from: {
@@ -82,8 +81,7 @@ const sendTemplate = async (
   await sendEmail(to, {
     ...options,
     html,
-    text,
-    attachments: templates[templateName].assets
+    text
   });
 
   // TODO: Test

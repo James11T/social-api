@@ -29,20 +29,18 @@ const createPostController = async (req: Request, res: Response, next: NextFunct
   const files = alwaysArray(req.files.media);
   const postId = uuid();
 
-  let uploads;
-  try {
-    uploads = await Promise.all(
-      files.map(async (file, index) => {
-        await uploadFile(file.data, `media/${postId}/media${index}`);
-        return `https://${WEB_CONSTANTS.MEDIA_SUBDOMAIN}.${WEB_DOMAIN}/media/${postId}/media${index}`;
-      })
-    );
-  } catch {
-    return next(new APIServerError("Error uploading files"));
+  const uploads: string[] = [];
+
+  for (const [index, file] of files.entries()) {
+    const uploadRes = await uploadFile(file.data, `media/${postId}/media${index}`);
+    if (uploadRes.err) return next(new APIServerError("Error uploading files"));
+
+    uploads.push(`https://${WEB_CONSTANTS.MEDIA_SUBDOMAIN}.${WEB_DOMAIN}/media/${postId}/media${index}`);
   }
 
   return res.json({
-    media: uploads
+    media: uploads,
+    postId
   });
   // TODO: Current
   // TODO: Implement remaining data

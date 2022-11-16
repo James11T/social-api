@@ -4,7 +4,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="Content-Type" content="text/html charset=UTF-8" />
-    <title>2FA Enabled</title>
   </head>
   <body
     style="
@@ -32,11 +31,7 @@
           <td style="padding: 0">
             <center>
               <a href="https://kakaposocial.com/" style="text-decoration: none">
-                <img
-                  src="static/banner.png"
-                  alt="Kakapo Branding"
-                  height="35"
-                />
+                <img src="{{assets.banner}}" alt="Kakapo Branding" height="35" />
               </a>
             </center>
           </td>
@@ -49,22 +44,10 @@
           <td height="2" style="padding: 0; background-color: #eeeeee"></td>
         </tr>
         <tr>
-          <td height="15" style="padding: 0; background-color: white"></td>
+          <td height="20" style="padding: 0; background-color: white"></td>
         </tr>
-        <tr>
-          <td style="padding: 0; background-color: white; padding: 0 10px">
-            <h3 style="margin: 0; font-weight: 500">Hello {{name}}!</h3>
-            <p style="margin: 0; font-weight: lighter">
-              We're just emailing you to let you know that you recently enabled
-              2FA on your account. Thank you for helping us help you keep your
-              account secure.
-            </p>
-            <p>
-              If this was not you then you should contact support immidiately
-              and ensure that your email account is secure.
-            </p>
-          </td>
-        </tr>
+
+        {{> @partial-block }}
 
         <tr>
           <td height="20" style="padding: 0; background-color: white"></td>
@@ -77,7 +60,7 @@
         <tr>
           <td style="padding: 0; background-color: #ebebeb">
             <center>
-              <img src="static/shadowlogo.png" alt="Kakapo Logo" width="110" />
+              <img src="{{assets.shadowlogo}}" alt="Kakapo Logo" width="110" />
             </center>
           </td>
         </tr>
@@ -87,9 +70,7 @@
         <tr>
           <td style="padding: 0; background-color: #ebebeb" class="footer">
             <center>
-              <a href="#" style="margin: 0 10px; display: block; color: #aaaaaa"
-                >Why am I reveiving this email?</a
-              >
+              <a href="#" style="margin: 0 10px; display: block; color: #aaaaaa">Why am I receiving this email?</a>
             </center>
           </td>
         </tr>
@@ -99,33 +80,35 @@
         <tr>
           <td style="padding: 0; background-color: #ebebeb" class="footer">
             <center>
-              <a href="#" style="margin: 0 10px; display: block; color: #aaaaaa"
-                >Unsubscribe / Stop receiving emails.</a
-              >
+              <a href="#" style="margin: 0 10px; display: block; color: #aaaaaa">Unsubscribe / Stop receiving emails.</a>
             </center>
           </td>
         </tr>
         <tr>
           <td height="20" style="padding: 0; background-color: #ebebeb"></td>
         </tr>
-        <tr>
-          <td height="5" style="padding: 0; background-color: #e7e7e7"></td>
-        </tr>
-        <tr>
-          <td
-            style="
-              padding: 0;
-              background-color: #e7e7e7;
-              color: #777777;
-              padding-left: 8px;
-            "
-          >
-            Request originated from {{request.flag}} {{request.ip}}
-          </td>
-        </tr>
-        <tr>
-          <td height="5" style="padding: 0; background-color: #e7e7e7"></td>
-        </tr>
+        {{#if request}}
+          <tr>
+            <td height="5" style="padding: 0; background-color: #e7e7e7"></td>
+          </tr>
+          <tr>
+            <td
+              style="
+                padding: 0;
+                color: #888888;
+                background-color: #e7e7e7;
+                padding-left: 8px;
+              "
+            >
+              Request originated from
+              {{request.flag}}
+              {{request.ip}}
+            </td>
+          </tr>
+          <tr>
+            <td height="5" style="padding: 0; background-color: #e7e7e7"></td>
+          </tr>
+        {{/if}}
       </table>
     </center>
   </body>
