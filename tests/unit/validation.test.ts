@@ -1,4 +1,5 @@
-import { PasswordRequirements } from "../../src/constants";
+import { describe, it, test, expect } from "vitest";
+import { PASSWORD_CONSTANTS } from "../../src/config";
 import { validateEmail, validatePassword } from "../../src/validation/data";
 
 // https://gist.github.com/cjaoude/fd9910626629b53c4d25
@@ -62,11 +63,11 @@ const passwordOptions = {
 
 const proxyValidPassword = (
   password: string,
-  options: PasswordRequirements = {}
+  options: Partial<typeof PASSWORD_CONSTANTS> = {}
 ) => validatePassword(password, { ...passwordOptions, ...options });
 
 describe("password validation", () => {
-  it("should accept with standard paramters and valid password", () => {
+  it("should accept with standard parameters and valid password", () => {
     expect(proxyValidPassword("password")).toBeTruthy();
   });
 

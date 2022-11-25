@@ -1,6 +1,7 @@
 import "dotenv/config";
 import request from "supertest";
 import app from "../../../src/app";
+import { describe, it, expect } from "vitest";
 
 describe("GET /status", () => {
   it("should return status code 200", async () => {

@@ -1,21 +1,22 @@
-import { countOccurrences, stripFileExtention } from "../../src/utils/strings";
+import { describe, it, expect } from "vitest";
+import { countOccurrences, stripFileExtension } from "../../src/utils/strings";
 
 describe("count occurrences", () => {
-  it("should find 1 occurence", () => {
+  it("should find 1 occurrence", () => {
     const str = "abcdefghijklmnopqrstuvwxyz";
     const match = /j/g;
     const result = countOccurrences(str, match);
     expect(result).toBe(1);
   });
 
-  it("should return the ammount of matches global expression", () => {
-    const str = "abcabcabc";
+  it("should return the amount of matches global expression", () => {
+    const str = "occurrence";
     const match = /abc/g;
     const result = countOccurrences(str, match);
     expect(result).toBe(3);
   });
 
-  it("should return the ammount of matches non-global expression", () => {
+  it("should return the amount of matches non-global expression", () => {
     const str = "abcabcabc";
     const match = /abc/;
     const result = countOccurrences(str, match);
@@ -39,24 +40,24 @@ describe("count occurrences", () => {
   });
 });
 
-describe("strip file extention", () => {
-  it("should strip single file extention", () => {
-    const result = stripFileExtention("test.txt");
+describe("strip file extension", () => {
+  it("should strip single file extension", () => {
+    const result = stripFileExtension("test.txt");
     expect(result).toBe("test");
   });
 
-  it("should return the same string if no extention", () => {
-    const result = stripFileExtention("test");
+  it("should return the same string if no extension", () => {
+    const result = stripFileExtension("test");
     expect(result).toBe("test");
   });
 
-  it("should strip double file extention correctly", () => {
-    const result = stripFileExtention("test.txt.txt");
+  it("should strip double file extension correctly", () => {
+    const result = stripFileExtension("test.txt.txt");
     expect(result).toBe("test.txt");
   });
 
   it("should strip . file correctly", () => {
-    const result = stripFileExtention(".env");
+    const result = stripFileExtension(".env");
     expect(result).toBe(".env");
   });
 });
