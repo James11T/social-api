@@ -9,7 +9,9 @@ import { v4 as uuid4 } from "uuid";
  * @returns The amount of occurrences of the match
  */
 const countOccurrences = (str: string, match: RegExp): number => {
-  const exp = match.global ? match : new RegExp(match.source, `g${match.flags}`);
+  const exp = match.global
+    ? match
+    : new RegExp(match.source, `g${match.flags}`);
 
   const matches = str.match(exp) || [];
   return matches.length;

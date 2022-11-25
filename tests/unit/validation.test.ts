@@ -15,7 +15,7 @@ const validEmails = [
   "email@example.name",
   "email@example.museum",
   "email@example.co.jp",
-  "firstname-lastname@example.com"
+  "firstname-lastname@example.com",
 ];
 
 const invalidEmails = [
@@ -35,7 +35,7 @@ const invalidEmails = [
   "email@example..com",
   "Abc..123@example.com",
   "”(),:;<>[\\]@example.com",
-  'this\\ is"really"not\\allowed@example.com'
+  'this\\ is"really"not\\allowed@example.com',
 ];
 
 describe("email validation", () => {
@@ -57,7 +57,7 @@ const passwordOptions = {
   minSpecialCharacters: 0,
   minNumbers: 0,
   mustVaryCase: false,
-  nonSpecialCharacters: /[a-zA-Z0-9 ]/g
+  nonSpecialCharacters: /[a-zA-Z0-9 ]/g,
 };
 
 const proxyValidPassword = (
@@ -75,7 +75,7 @@ describe("password validation", () => {
       expect(
         proxyValidPassword("12345678", {
           minPasswordLength: 5,
-          maxPasswordLength: 10
+          maxPasswordLength: 10,
         })
       ).toBeTruthy();
     });
@@ -87,7 +87,7 @@ describe("password validation", () => {
     it("should reject too long password", () => {
       expect(
         proxyValidPassword("12345678", {
-          maxPasswordLength: 5
+          maxPasswordLength: 5,
         })
       ).toBeFalsy();
     });
@@ -103,7 +103,7 @@ describe("password validation", () => {
     it("should accept with more than minimum special characters", () => {
       expect(
         proxyValidPassword("specialcharacter@@@@@@@", {
-          minSpecialCharacters: 3
+          minSpecialCharacters: 3,
         })
       ).toBeTruthy();
     });

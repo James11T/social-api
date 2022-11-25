@@ -8,14 +8,22 @@ const { EMAIL_DEV_SERVER_PORT } = process.env;
 
 const TEMPLATE_DIR = "src/email/views/";
 
-handlebars.registerPartial("base", handlebars.compile(fs.readFileSync(`${TEMPLATE_DIR}base.hbs`, "utf8")));
+handlebars.registerPartial(
+  "base",
+  handlebars.compile(fs.readFileSync(`${TEMPLATE_DIR}base.hbs`, "utf8"))
+);
 
-const templateFolders = fs.readdirSync(TEMPLATE_DIR, { withFileTypes: true }).filter((path) => path.isDirectory());
+const templateFolders = fs
+  .readdirSync(TEMPLATE_DIR, { withFileTypes: true })
+  .filter((path) => path.isDirectory());
 
 const templates: Record<string, HandlebarsTemplateDelegate> = {};
 
 for (const templateDir of templateFolders) {
-  const content = fs.readFileSync(`${TEMPLATE_DIR}${templateDir.name}/template.hbs`, "utf8");
+  const content = fs.readFileSync(
+    `${TEMPLATE_DIR}${templateDir.name}/template.hbs`,
+    "utf8"
+  );
   templates[templateDir.name] = handlebars.compile(content);
 }
 
@@ -34,7 +42,12 @@ app.get("/:template", (req, res) => {
 
   if (!(template in templates)) return res.status(404).send("Invalid template");
 
-  return res.send(templates[template]({ name: "Username", request: { ip: "127.0.0.1", flag: "🌍" } }));
+  return res.send(
+    templates[template]({
+      name: "Username",
+      request: { ip: "127.0.0.1", flag: "🌍" },
+    })
+  );
 });
 
 app.listen(EMAIL_DEV_SERVER_PORT, () => {

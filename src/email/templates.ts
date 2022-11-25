@@ -19,7 +19,10 @@ interface Templates {
   [key: string]: APITemplate;
 }
 
-handlebars.registerPartial("base", handlebars.compile(fs.readFileSync(`${TEMPLATE_DIR}base.hbs`, "utf8")));
+handlebars.registerPartial(
+  "base",
+  handlebars.compile(fs.readFileSync(`${TEMPLATE_DIR}base.hbs`, "utf8"))
+);
 
 /**
  * Load the text fallback for a HTML email template
@@ -31,7 +34,10 @@ handlebars.registerPartial("base", handlebars.compile(fs.readFileSync(`${TEMPLAT
 const loadFallback = (dirName: string) => {
   let fallback: string;
   try {
-    fallback = fs.readFileSync(`${TEMPLATE_DIR}${dirName}/fallback.txt`, "utf8");
+    fallback = fs.readFileSync(
+      `${TEMPLATE_DIR}${dirName}/fallback.txt`,
+      "utf8"
+    );
   } catch (error) {
     fallback = NO_FALLBACK;
   }
@@ -48,7 +54,10 @@ const loadFallback = (dirName: string) => {
  * @returns Template file render function with a list of attachments
  */
 const loadTemplate = (dirName: string): APITemplate => {
-  const template = fs.readFileSync(`${TEMPLATE_DIR}${dirName}/template.hbs`, "utf8");
+  const template = fs.readFileSync(
+    `${TEMPLATE_DIR}${dirName}/template.hbs`,
+    "utf8"
+  );
 
   const render = handlebars.compile(template);
   const fallback = loadFallback(dirName);
@@ -67,7 +76,9 @@ const loadTemplates = () => {
   const templates: Templates = {};
 
   // Get all directory names in the template directory
-  const templateFolders = fs.readdirSync(TEMPLATE_DIR, { withFileTypes: true }).filter((path) => path.isDirectory());
+  const templateFolders = fs
+    .readdirSync(TEMPLATE_DIR, { withFileTypes: true })
+    .filter((path) => path.isDirectory());
 
   templateFolders.forEach((templateDir) => {
     try {
@@ -110,7 +121,7 @@ const sendTemplate = async (
   await sendEmail(to, {
     ...options,
     html,
-    text
+    text,
   });
 
   // TODO: Test

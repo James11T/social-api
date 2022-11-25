@@ -21,12 +21,16 @@ const requiredEnvVars = [
   "AWS_REGION",
   "AWS_ACCESS_KEY_ID",
   "AWS_SECRET_ACCESS_KEY",
-  "AWS_S3_IMAGE_BUCKET"
+  "AWS_S3_IMAGE_BUCKET",
 ];
 
 const anyMissing = requiredEnvVars.some((envVar) => {
   if (!process.env[envVar]) {
-    console.error(format.fail(`Required environment variable ${chalk.bold(envVar)} is not set.`));
+    console.error(
+      format.fail(
+        `Required environment variable ${chalk.bold(envVar)} is not set.`
+      )
+    );
     return true;
   }
 });
@@ -35,7 +39,8 @@ if (anyMissing) process.exit(0);
 
 const start = async () => {
   console.log(format.waiting("Starting..."));
-  if (RUNTIME_CONSTANTS.IS_DEV) console.log(format.dev("Running in development mode"));
+  if (RUNTIME_CONSTANTS.IS_DEV)
+    console.log(format.dev("Running in development mode"));
 
   const initDbResult = await initializeDatabase();
 
@@ -50,7 +55,11 @@ const start = async () => {
     const localAddr = `http://localhost:${API_PORT}/`;
     const remoteAddr = `http://${ip.address()}:${API_PORT}/`;
 
-    console.log(`\n${chalk.green("●")} Server is running on port ${chalk.blue.bold(API_PORT)}`);
+    console.log(
+      `\n${chalk.green("●")} Server is running on port ${chalk.blue.bold(
+        API_PORT
+      )}`
+    );
     console.log(`   Connect locally with ${format.link(localAddr)}`);
     console.log(`   Or on another device with ${format.link(remoteAddr)}`);
   });

@@ -55,5 +55,5 @@ export {
   createCommentController,
   getCommentController,
   deleteCommentController,
-  editCommentController
+  editCommentController,
 };

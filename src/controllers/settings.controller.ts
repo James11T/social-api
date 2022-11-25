@@ -33,5 +33,5 @@ const setSettingController = async (req: Request, res: Response) => {
 export {
   getSettingsController,
   getSpecificSettingController,
-  setSettingController
+  setSettingController,
 };

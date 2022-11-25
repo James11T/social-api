@@ -5,7 +5,14 @@ import { uuid } from "../utils/strings";
 import { UserTOTP } from "./userTOTP.model";
 import { Friendship } from "./friendship.model";
 import { RefreshToken } from "./refreshToken.model";
-import { Entity, Column, PrimaryColumn, OneToMany, BeforeInsert, FindOptionsWhere } from "typeorm";
+import {
+  Entity,
+  Column,
+  PrimaryColumn,
+  OneToMany,
+  BeforeInsert,
+  FindOptionsWhere,
+} from "typeorm";
 import type { Result } from "ts-results";
 import type { Relation, FindOneOptions } from "typeorm";
 
@@ -55,8 +62,15 @@ export class User extends BaseModel {
     this.id = this.id ?? uuid();
   }
 
-  async checkTOTP(token: string): Promise<Result<boolean, "NO_ACTIVE_2FA" | "INVALID_TOTP" | "FAILED_TO_VERIFY_TOTP">> {
-    const userTOTPs = await UserTOTP.find({ relations: ["user"], where: { id: this.id, activated: true } });
+  async checkTOTP(
+    token: string
+  ): Promise<
+    Result<boolean, "NO_ACTIVE_2FA" | "INVALID_TOTP" | "FAILED_TO_VERIFY_TOTP">
+  > {
+    const userTOTPs = await UserTOTP.find({
+      relations: ["user"],
+      where: { id: this.id, activated: true },
+    });
     if (userTOTPs.length === 0) return Err("NO_ACTIVE_2FA");
 
     let isAnyValid = true;
@@ -70,11 +84,16 @@ export class User extends BaseModel {
   }
 
   async has2FA(): Promise<boolean> {
-    const userTOTPs = await UserTOTP.find({ relations: ["user"], where: { id: this.id, activated: true } });
+    const userTOTPs = await UserTOTP.find({
+      relations: ["user"],
+      where: { id: this.id, activated: true },
+    });
     return userTOTPs.length > 0;
   }
 
-  private static async fetchUser(query: FindOneOptions<User>): Promise<Result<User | null, FETCH_USER_ERRORS>> {
+  private static async fetchUser(
+    query: FindOneOptions<User>
+  ): Promise<Result<User | null, FETCH_USER_ERRORS>> {
     try {
       const user = await User.findOne(query);
       return Ok(user);
@@ -102,8 +121,8 @@ export class User extends BaseModel {
       const FRs = await Friendship.find({
         where: {
           accepted: false,
-          ...query
-        }
+          ...query,
+        },
       });
       return Ok(FRs);
     } catch (err) {
@@ -114,13 +133,13 @@ export class User extends BaseModel {
 
   public async getIncomingFriendRequests() {
     return this.getFriendRequests({
-      userToId: this.id
+      userToId: this.id,
     });
   }
 
   public async getOutgoingFriendRequests() {
     return this.getFriendRequests({
-      userFromId: this.id
+      userFromId: this.id,
     });
   }
 

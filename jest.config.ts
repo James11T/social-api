@@ -4,13 +4,13 @@ const config: Config.InitialOptions = {
   verbose: true,
   maxWorkers: 1,
   transform: {
-    "^.+\\.tsx?$": "ts-jest"
+    "^.+\\.tsx?$": "ts-jest",
   },
   globals: {
     "ts-jest": {
-      isolatedModules: true
-    }
-  }
+      isolatedModules: true,
+    },
+  },
 };
 
 export default config;

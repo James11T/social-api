@@ -52,5 +52,5 @@ export {
   queryLikeController,
   deleteLikeController,
   createLikeController,
-  countLikeController
+  countLikeController,
 };

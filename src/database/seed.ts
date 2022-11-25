@@ -12,10 +12,17 @@ const generateUser = (index: number) => ({
   about: `User #${index}`,
   email: `user${index}@kakaposocial.com`,
   registeredAt: new Date(),
-  passwordHash: "abc123"
+  passwordHash: "abc123",
 });
 
-const users = [generateUser(0), generateUser(1), generateUser(2), generateUser(3), generateUser(4), generateUser(5)];
+const users = [
+  generateUser(0),
+  generateUser(1),
+  generateUser(2),
+  generateUser(3),
+  generateUser(4),
+  generateUser(5),
+];
 
 const seed = async () => {
   try {
@@ -39,7 +46,9 @@ const seed = async () => {
         newUser.passwordHash = user.passwordHash;
         await newUser.save();
       }
-      console.log(format.success(`Successfully seeded ${chalk.bold(users.length)} users`));
+      console.log(
+        format.success(`Successfully seeded ${chalk.bold(users.length)} users`)
+      );
     } catch (err) {
       console.error(err);
       console.log(format.fail("Failed to seed database"));
@@ -51,7 +60,8 @@ const seed = async () => {
   const user2 = await User.findOne({ where: { username: users[2].username } });
   const user3 = await User.findOne({ where: { username: users[3].username } });
 
-  if (!user0 || !user1 || !user2 || !user3) return console.log(format.fail("Failed to get users"));
+  if (!user0 || !user1 || !user2 || !user3)
+    return console.log(format.fail("Failed to get users"));
 
   if (shouldBuild) {
     const friendship1 = new Friendship();

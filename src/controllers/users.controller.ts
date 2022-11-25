@@ -7,7 +7,12 @@ import { sendTemplate } from "../email/templates";
 import { countryCodeEmoji } from "country-code-emoji";
 import { Friendship, User, UserTOTP } from "../models";
 import { FriendshipState } from "../models/friendship.model";
-import { APIBadRequestError, APIServerError, APINotFoundError, APIUnauthorizedError } from "../errors/api";
+import {
+  APIBadRequestError,
+  APIServerError,
+  APINotFoundError,
+  APIUnauthorizedError,
+} from "../errors/api";
 import type { Result } from "ts-results";
 import type { Request, Response, NextFunction } from "express";
 
@@ -33,9 +38,9 @@ const filterUserController = async (
   try {
     const users = await User.find({
       where: {
-        username: Like(`%${username}%`)
+        username: Like(`%${username}%`),
       },
-      take: limit
+      take: limit,
     });
     return res.json(users);
   } catch (err) {
@@ -50,7 +55,11 @@ const filterUserController = async (
  * @param req Express request object
  * @param res Express response object
  */
-const getUserController = async (req: Request, res: Response, next: NextFunction) => {
+const getUserController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { id } = req.params;
 
   const user = await User.fromId(id);
@@ -66,7 +75,11 @@ const getUserController = async (req: Request, res: Response, next: NextFunction
  * @param req Express request object
  * @param res Express response object
  */
-const getFriendRequestsController = async (req: Request, res: Response, next: NextFunction) => {
+const getFriendRequestsController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { id } = req.params;
 
   const user = await User.fromId(id);
@@ -76,7 +89,8 @@ const getFriendRequestsController = async (req: Request, res: Response, next: Ne
 
   const friendRequests = await user.val.getIncomingFriendRequests();
 
-  if (friendRequests.err) return next(new APIServerError("Failed to get friend requests"));
+  if (friendRequests.err)
+    return next(new APIServerError("Failed to get friend requests"));
 
   return res.json(friendRequests.val);
 }; // GET
@@ -87,28 +101,47 @@ const getFriendRequestsController = async (req: Request, res: Response, next: Ne
  * @param req Express request object
  * @param res Express response object
  */
-const sendFriendRequestsController = async (req: Request, res: Response, next: NextFunction) => {
+const sendFriendRequestsController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { from: fromId, to: toId } = req.body;
 
   const fromUser = await User.fromId(fromId);
   const toUser = await User.fromId(toId);
 
-  if (fromUser.err || toUser.err) return next(new APIServerError("Failed to get users"));
-  if (!fromUser.val) return next(new APINotFoundError("Friend request sender not found"));
-  if (!toUser.val) return next(new APINotFoundError("Friend request recipient not found"));
+  if (fromUser.err || toUser.err)
+    return next(new APIServerError("Failed to get users"));
+  if (!fromUser.val)
+    return next(new APINotFoundError("Friend request sender not found"));
+  if (!toUser.val)
+    return next(new APINotFoundError("Friend request recipient not found"));
 
   // Double check in case of formatting
   if (fromUser.val.id === toUser.val.id)
-    return next(new APIBadRequestError("Cannot send a friend request to yourself"));
+    return next(
+      new APIBadRequestError("Cannot send a friend request to yourself")
+    );
 
-  const friendshipState = await Friendship.getFriendshipState(fromUser.val, toUser.val);
+  const friendshipState = await Friendship.getFriendshipState(
+    fromUser.val,
+    toUser.val
+  );
 
-  if (friendshipState.err) return next(new APIServerError("Failed to check friendship status"));
+  if (friendshipState.err)
+    return next(new APIServerError("Failed to check friendship status"));
 
   if (friendshipState.val === FriendshipState.PENDING) {
-    return next(new APIBadRequestError("You already have a pending friend request with this user"));
+    return next(
+      new APIBadRequestError(
+        "You already have a pending friend request with this user"
+      )
+    );
   } else if (friendshipState.val === FriendshipState.FRIENDS) {
-    return next(new APIBadRequestError("You are already friends with this user"));
+    return next(
+      new APIBadRequestError("You are already friends with this user")
+    );
   }
 
   try {
@@ -132,7 +165,11 @@ const sendFriendRequestsController = async (req: Request, res: Response, next: N
  * @param req Express request object
  * @param res Express response object
  */
-const getUserFriendsController = async (req: Request, res: Response, next: NextFunction) => {
+const getUserFriendsController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { id } = req.params;
 
   const user = await User.fromId(id);
@@ -142,13 +179,18 @@ const getUserFriendsController = async (req: Request, res: Response, next: NextF
 
   const friends = await user.val.getFriends();
 
-  if (friends.err) return next(new APIServerError("Failed to get friend requests"));
+  if (friends.err)
+    return next(new APIServerError("Failed to get friend requests"));
 
   return res.json(friends.val);
   // TODO: Test
 }; // GET
 
-const isUsernameTakenController = async (req: Request, res: Response, next: NextFunction) => {
+const isUsernameTakenController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { username } = req.params;
 
   const user = await User.fromUsername(username);
@@ -182,7 +224,11 @@ const create2FA = async (req: Request, res: Response, next: NextFunction) => {
     return next(new APIServerError("Failed to generate new TOTP instance"));
   }
 
-  const TOTPUrl = authenticator.keyuri(user.val.email, TOTP_CONSTANTS.SERVICE, secret);
+  const TOTPUrl = authenticator.keyuri(
+    user.val.email,
+    TOTP_CONSTANTS.SERVICE,
+    secret
+  );
 
   let userQR: string;
   try {
@@ -202,10 +248,12 @@ const setTotpActive = async (
   active: boolean
 ): Promise<Result<[User, UserTOTP], APIServerError | APIUnauthorizedError>> => {
   const user = await User.fromId(userId);
-  if (user.err || !user.val) return Err(new APIServerError("Failed to fetch user"));
+  if (user.err || !user.val)
+    return Err(new APIServerError("Failed to fetch user"));
 
   const userTOTP = await UserTOTP.byId(totpId, user.val);
-  if (userTOTP.err || !userTOTP.val) return Err(new APIServerError("Failed to fetch user totp"));
+  if (userTOTP.err || !userTOTP.val)
+    return Err(new APIServerError("Failed to fetch user totp"));
 
   const isValid = userTOTP.val.checkCode(totp);
   if (isValid.err) return Err(new APIServerError("Failed to check TOTP"));
@@ -214,7 +262,8 @@ const setTotpActive = async (
 
   userTOTP.val.activated = active;
   const saveResult = await userTOTP.val.pcallSave();
-  if (saveResult.err) return Err(new APIServerError("Failed to update TOTP settings"));
+  if (saveResult.err)
+    return Err(new APIServerError("Failed to update TOTP settings"));
 
   return Ok([user.val, userTOTP.val]);
 };
@@ -241,7 +290,7 @@ const activate2FA = async (
       "2FAEnabled",
       {
         name: user.username,
-        ip: req.realIp
+        ip: req.realIp,
       },
       { subject: "A new 2FA source has been activated on your account" }
     );
@@ -277,7 +326,7 @@ const disable2FA = async (
       "2FADisabled",
       {
         name: user.username,
-        ip: req.realIp
+        ip: req.realIp,
       },
       { subject: "2FA Disabled" }
     );
@@ -298,7 +347,9 @@ const getTOTP_IDs = async (req: Request, res: Response, next: NextFunction) => {
   if (!user.val) return next(new APINotFoundError("User not found"));
 
   try {
-    const userTOTPs = await UserTOTP.find({ where: { user: { id: user.val.id }, activated: true } });
+    const userTOTPs = await UserTOTP.find({
+      where: { user: { id: user.val.id }, activated: true },
+    });
     return res.json(userTOTPs.map((userTOTP) => ({ totpId: userTOTP.id })));
   } catch (err) {
     console.error(err);
@@ -316,5 +367,5 @@ export {
   create2FA,
   activate2FA,
   disable2FA,
-  getTOTP_IDs
+  getTOTP_IDs,
 };

@@ -4,13 +4,13 @@ import {
   createPostController,
   getPostController,
   deletePostController,
-  editPostController
+  editPostController,
 } from "../controllers/posts.controller";
 import fileUpload from "express-fileupload";
 import { POST_CONSTANTS } from "../config";
 import {
   validateMedia,
-  validateCreatePost
+  validateCreatePost,
 } from "../validation/routes/posts.validation";
 
 const postsRouter = Router();
@@ -21,8 +21,8 @@ postsRouter.post(
   fileUpload({
     limits: {
       files: POST_CONSTANTS.MAX_MEDIA_COUNT,
-      fileSize: POST_CONSTANTS.MAX_MEDIA_SIZE
-    }
+      fileSize: POST_CONSTANTS.MAX_MEDIA_SIZE,
+    },
   }),
   validateCreatePost,
   validateMedia,

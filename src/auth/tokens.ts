@@ -18,11 +18,13 @@ const generateAccessToken = async (
   refreshToken: JWTRefreshToken
 ): Promise<Result<JWTAccessToken, GENERATE_ACCESS_TOKEN_ERRORS>> => {
   if (refreshToken.exp < getEpoch()) return Err("REFRESH_TOKEN_EXPIRED");
-  
+
   let DBRefreshToken: RefreshToken | null;
 
   try {
-    DBRefreshToken = await RefreshToken.findOne({ where: { id: refreshToken.jti } });
+    DBRefreshToken = await RefreshToken.findOne({
+      where: { id: refreshToken.jti },
+    });
   } catch {
     return Err("FAILED_TO_GET_REFRESH_TOKEN");
   }
@@ -39,13 +41,16 @@ const generateAccessToken = async (
     refresh_jti: DBRefreshToken.id,
     sub: user.id,
     exp: now + ACCESS_TOKEN_CONSTANTS.TOKEN_TTL,
-    iat: now
+    iat: now,
   };
 
   return Ok(data);
 };
 
-const generateRefreshToken = async (user: User, scope: string): Promise<[JWTRefreshToken, string]> => {
+const generateRefreshToken = async (
+  user: User,
+  scope: string
+): Promise<[JWTRefreshToken, string]> => {
   const tokenId = uuid();
   const now = getEpoch();
 
@@ -54,7 +59,7 @@ const generateRefreshToken = async (user: User, scope: string): Promise<[JWTRefr
     sub: user.id,
     iat: now,
     exp: now + REFRESH_TOKEN_CONSTANTS.TOKEN_TTL,
-    scp: scope
+    scp: scope,
   };
 
   return [data, tokenId];

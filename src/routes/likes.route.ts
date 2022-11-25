@@ -3,7 +3,7 @@ import {
   queryLikeController,
   deleteLikeController,
   createLikeController,
-  countLikeController
+  countLikeController,
 } from "../controllers/like.controller";
 
 const likeRouter = Router();

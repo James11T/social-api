@@ -1,9 +1,21 @@
 import { Err, Ok } from "ts-results";
 import { DataSource } from "typeorm";
-import { User, Friendship, Post, PostMedia, UserTOTP, RefreshToken } from "../models";
+import {
+  User,
+  Friendship,
+  Post,
+  PostMedia,
+  UserTOTP,
+  RefreshToken,
+} from "../models";
 import type { Result } from "ts-results";
 
-const { DB_USER, DB_PASSWORD, DB_DATABASE, DB_HOST = "localhost" } = process.env;
+const {
+  DB_USER,
+  DB_PASSWORD,
+  DB_DATABASE,
+  DB_HOST = "localhost",
+} = process.env;
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -15,10 +27,12 @@ export const AppDataSource = new DataSource({
   logging: true,
   entities: [User, Friendship, Post, PostMedia, UserTOTP, RefreshToken],
   subscribers: [],
-  migrations: []
+  migrations: [],
 });
 
-const initializeDatabase = async (): Promise<Result<DataSource, "FAILED_TO_INITIALIZE">> => {
+const initializeDatabase = async (): Promise<
+  Result<DataSource, "FAILED_TO_INITIALIZE">
+> => {
   try {
     const dataSource = await AppDataSource.initialize();
     return Ok(dataSource);

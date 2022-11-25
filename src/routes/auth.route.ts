@@ -3,9 +3,13 @@ import {
   authenticateController,
   signUpController,
   forgotPasswordController,
-  whoAmIController
+  whoAmIController,
 } from "../controllers/auth.controller";
-import { validateSignIn, validateSignUp, validateForgotPassword } from "../validation/routes/auth.validation";
+import {
+  validateSignIn,
+  validateSignUp,
+  validateForgotPassword,
+} from "../validation/routes/auth.validation";
 
 const authRouter = Router();
 

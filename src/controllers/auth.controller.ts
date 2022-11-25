@@ -3,7 +3,7 @@ import {
   APIConflictError,
   APINotFoundError,
   APIBadRequestError,
-  APIUnauthorizedError
+  APIUnauthorizedError,
 } from "../errors/api";
 import { User } from "../models";
 import { sendTemplate } from "../email/templates";
@@ -11,7 +11,11 @@ import { generateAccessToken, generateRefreshToken } from "../auth/tokens";
 import { decodeSignedToken, signToken } from "../utils/jwt";
 import { getVerificationToken } from "../email/verification";
 import { WEB_CONSTANTS, RUNTIME_CONSTANTS } from "../config";
-import { hashPassword, invokePasswordReset, verifyPassword } from "../auth/password";
+import {
+  hashPassword,
+  invokePasswordReset,
+  verifyPassword,
+} from "../auth/password";
 import type { JWTRefreshToken } from "../types";
 import type { NextFunction, Request, Response } from "express";
 
@@ -33,11 +37,16 @@ const authenticateController = async (
 ) => {
   const user = await User.findOne({ where: { email: req.body.email } });
 
-  const failError = new APINotFoundError("No user with the given email exists.");
+  const failError = new APINotFoundError(
+    "No user with the given email exists."
+  );
 
   if (!user) return next(failError);
 
-  const passwordsMatch = await verifyPassword(req.body.password, user.passwordHash);
+  const passwordsMatch = await verifyPassword(
+    req.body.password,
+    user.passwordHash
+  );
   if (!passwordsMatch) return next(failError);
 
   const [refreshToken] = await generateRefreshToken(user, "auth");
@@ -52,14 +61,18 @@ const authenticateController = async (
     refreshToken: signedToken.val,
     user: {
       email: user.email,
-      username: user.username
-    }
+      username: user.username,
+    },
   });
 
   // TODO: Test
 }; // POST
 
-const refreshAccessController = async (req: Request, res: Response, next: NextFunction) => {
+const refreshAccessController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { refreshToken, userId } = req.body;
 
   const user = await User.fromId(userId);
@@ -71,19 +84,21 @@ const refreshAccessController = async (req: Request, res: Response, next: NextFu
 
   if (tokenResult.err) return next(new APIUnauthorizedError(tokenResult.val));
 
-  if (tokenResult.val.sub !== user.val.id) return next(new APIUnauthorizedError("Invalid refresh token"));
+  if (tokenResult.val.sub !== user.val.id)
+    return next(new APIUnauthorizedError("Invalid refresh token"));
 
   const accessToken = await generateAccessToken(user.val, tokenResult.val);
 
   if (accessToken.err) {
-    if (accessToken.val === "FAILED_TO_GET_REFRESH_TOKEN") return next(new APIServerError(accessToken.val));
+    if (accessToken.val === "FAILED_TO_GET_REFRESH_TOKEN")
+      return next(new APIServerError(accessToken.val));
 
     return next(new APIBadRequestError(accessToken.val));
   }
 
   const accessJWT = signToken(accessToken);
 
-  if (accessJWT.err) return 
+  if (accessJWT.err) return;
 
   return res.json({});
 
@@ -107,15 +122,22 @@ interface SignUpBody {
  *
  * Methods: POST
  */
-const signUpController = async (req: Request<unknown, unknown, SignUpBody>, res: Response, next: NextFunction) => {
-  if (req.user) return next(new APIBadRequestError("Cannot sign up while authenticated"));
+const signUpController = async (
+  req: Request<unknown, unknown, SignUpBody>,
+  res: Response,
+  next: NextFunction
+) => {
+  if (req.user)
+    return next(new APIBadRequestError("Cannot sign up while authenticated"));
 
   const { username, email, password } = req.body;
 
   const getUsername = await User.fromUsername(username);
-  if (getUsername.err) return next(new APIServerError("Failed to check username availability"));
+  if (getUsername.err)
+    return next(new APIServerError("Failed to check username availability"));
 
-  if (getUsername.val) return next(new APIConflictError("User ID is taken or reserved"));
+  if (getUsername.val)
+    return next(new APIConflictError("User ID is taken or reserved"));
 
   const passwordHash = await hashPassword(password);
   if (passwordHash.err) {
@@ -142,7 +164,7 @@ const signUpController = async (req: Request<unknown, unknown, SignUpBody>, res:
       "confirmEmail",
       {
         name: username,
-        link: `${WEB_CONSTANTS.URL}email/verify?c=${verificationToken}`
+        link: `${WEB_CONSTANTS.URL}email/verify?c=${verificationToken}`,
       },
       { subject: "Confirm your email" }
     );
@@ -163,7 +185,11 @@ const signUpController = async (req: Request<unknown, unknown, SignUpBody>, res:
  * @param req Express request object
  * @param res Express response object
  */
-const forgotPasswordController = async (req: Request, res: Response, next: NextFunction) => {
+const forgotPasswordController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { id } = req.params;
 
   const user = await User.fromId(id);
@@ -180,7 +206,7 @@ const forgotPasswordController = async (req: Request, res: Response, next: NextF
 
   res.json({
     success: true,
-    token: RUNTIME_CONSTANTS.IS_DEV ? token : undefined
+    token: RUNTIME_CONSTANTS.IS_DEV ? token : undefined,
   });
 
   // TODO: Test
@@ -189,7 +215,11 @@ const forgotPasswordController = async (req: Request, res: Response, next: NextF
 /**
  * Return the current user
  */
-const whoAmIController = async (req: Request, res: Response, next: NextFunction) => {
+const whoAmIController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.user) {
     return res.json({ user: null });
   }
@@ -199,4 +229,9 @@ const whoAmIController = async (req: Request, res: Response, next: NextFunction)
   // TODO: Test
 };
 
-export { authenticateController, signUpController, forgotPasswordController, whoAmIController };
+export {
+  authenticateController,
+  signUpController,
+  forgotPasswordController,
+  whoAmIController,
+};

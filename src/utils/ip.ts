@@ -14,7 +14,9 @@ const IPToCountry = (ip: string) => {
 
 type CountryToEmojiErrors = "INVALID_COUNTRY";
 
-const countryToEmoji = (countryCode: string): Result<string, CountryToEmojiErrors> => {
+const countryToEmoji = (
+  countryCode: string
+): Result<string, CountryToEmojiErrors> => {
   if (countryCode === FAIL_COUNTRY_CODE) return Ok("❓");
 
   try {

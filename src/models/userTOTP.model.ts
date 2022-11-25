@@ -3,7 +3,13 @@ import { User } from "./user.model";
 import { Err, Ok } from "ts-results";
 import { authenticator } from "otplib";
 import { uuid } from "../utils/strings";
-import { Entity, Column, PrimaryColumn, ManyToOne, BeforeInsert } from "typeorm";
+import {
+  Entity,
+  Column,
+  PrimaryColumn,
+  ManyToOne,
+  BeforeInsert,
+} from "typeorm";
 import type { Relation } from "typeorm";
 import type { Result } from "ts-results";
 
@@ -28,7 +34,9 @@ export class UserTOTP extends BaseModel {
     this.id = this.id ?? uuid();
   }
 
-  public checkCode(token: string): Result<boolean, "INVALID_TOTP" | "FAILED_TO_VERIFY_TOTP"> {
+  public checkCode(
+    token: string
+  ): Result<boolean, "INVALID_TOTP" | "FAILED_TO_VERIFY_TOTP"> {
     if (token.length < 6) return Err("INVALID_TOTP");
 
     try {
@@ -40,9 +48,15 @@ export class UserTOTP extends BaseModel {
     }
   }
 
-  public static async byId(id: string, user?: User): Promise<Result<UserTOTP | null, "FAILED_TO_GET_TOTP">> {
+  public static async byId(
+    id: string,
+    user?: User
+  ): Promise<Result<UserTOTP | null, "FAILED_TO_GET_TOTP">> {
     try {
-      const userTotp = await UserTOTP.findOneBy({ id, user: user ? { id: user.id } : undefined });
+      const userTotp = await UserTOTP.findOneBy({
+        id,
+        user: user ? { id: user.id } : undefined,
+      });
       return Ok(userTotp);
     } catch (err) {
       return Err("FAILED_TO_GET_TOTP");

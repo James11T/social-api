@@ -1,6 +1,7 @@
 import chalk from "chalk";
 
-const stringify = (icon: string, ...args: string[]) => `${icon} ${args.join(" ")}`;
+const stringify = (icon: string, ...args: string[]) =>
+  `${icon} ${args.join(" ")}`;
 
 const tick = (...args: string[]) => stringify(chalk.green("✓"), ...args);
 const cross = (...args: string[]) => stringify(chalk.red("✗"), ...args);
@@ -16,7 +17,7 @@ const format = {
   waiting: hourglass,
   dev: hammer,
   build: hammer,
-  link
+  link,
 };
 
 export default format;

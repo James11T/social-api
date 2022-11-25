@@ -12,7 +12,10 @@ class APIBaseError extends Error {
   toJSON(): any {
     return {
       error: this.message,
-      stack: RUNTIME_CONSTANTS.IS_DEV && this.stack ? this.stack.split("\n").map((line) => line.trim()) : undefined
+      stack:
+        RUNTIME_CONSTANTS.IS_DEV && this.stack
+          ? this.stack.split("\n").map((line) => line.trim())
+          : undefined,
     };
   }
 }
@@ -58,7 +61,10 @@ export type BadParams = Record<string, { location: string; message: string }>;
 class APIParameterError extends APIBadRequestError {
   parameters: BadParams;
 
-  constructor(msg = "One or more supplied parameters are invalid", parameters: BadParams) {
+  constructor(
+    msg = "One or more supplied parameters are invalid",
+    parameters: BadParams
+  ) {
     super(msg);
 
     this.parameters = parameters;
@@ -77,5 +83,5 @@ export {
   APINotFoundError,
   APIConflictError,
   APIServerError,
-  APIParameterError
+  APIParameterError,
 };

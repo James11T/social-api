@@ -23,7 +23,11 @@ const queryPostsController = async (req: Request, res: Response) => {
  * @param req Express request object
  * @param res Express response object
  */
-const createPostController = async (req: Request, res: Response, next: NextFunction) => {
+const createPostController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.files) return next(new APIBadRequestError("No files submitted"));
 
   const files = alwaysArray(req.files.media);
@@ -32,15 +36,20 @@ const createPostController = async (req: Request, res: Response, next: NextFunct
   const uploads: string[] = [];
 
   for (const [index, file] of files.entries()) {
-    const uploadRes = await uploadFile(file.data, `media/${postId}/media${index}`);
+    const uploadRes = await uploadFile(
+      file.data,
+      `media/${postId}/media${index}`
+    );
     if (uploadRes.err) return next(new APIServerError("Error uploading files"));
 
-    uploads.push(`https://${WEB_CONSTANTS.MEDIA_SUBDOMAIN}.${WEB_DOMAIN}/media/${postId}/media${index}`);
+    uploads.push(
+      `https://${WEB_CONSTANTS.MEDIA_SUBDOMAIN}.${WEB_DOMAIN}/media/${postId}/media${index}`
+    );
   }
 
   return res.json({
     media: uploads,
-    postId
+    postId,
   });
   // TODO: Current
   // TODO: Implement remaining data
@@ -76,4 +85,10 @@ const editPostController = async (req: Request, res: Response) => {
   // TODO: Implement
 }; // PATCH
 
-export { queryPostsController, createPostController, getPostController, deletePostController, editPostController };
+export {
+  queryPostsController,
+  createPostController,
+  getPostController,
+  deletePostController,
+  editPostController,
+};

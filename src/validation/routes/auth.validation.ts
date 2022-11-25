@@ -10,8 +10,12 @@ const passwordVerifier = (password: string) => validatePassword(password);
 const validateSignIn = [
   body("email").exists().withMessage("Email must be supplied"),
   body("password").notEmpty().withMessage("Password cannot be empty"),
-  body("totp").optional().isNumeric().isLength({ min: 6, max: 6 }).withMessage("TOTP is in invalid format"),
-  validateRequest
+  body("totp")
+    .optional()
+    .isNumeric()
+    .isLength({ min: 6, max: 6 })
+    .withMessage("TOTP is in invalid format"),
+  validateRequest,
 ];
 
 const validateSignUp = [
@@ -32,10 +36,13 @@ const validateSignUp = [
     .withMessage("Password cannot be empty")
     .custom(passwordVerifier)
     .withMessage(passwordErrorMessage),
-  validateRequest
+  validateRequest,
 ];
 
-const validateForgotPassword = [param("email").exists().notEmpty(), validateRequest];
+const validateForgotPassword = [
+  param("email").exists().notEmpty(),
+  validateRequest,
+];
 
 const validateChangePassword = [
   body("email").notEmpty(),
@@ -45,7 +52,7 @@ const validateChangePassword = [
     .custom(passwordVerifier)
     .withMessage(passwordErrorMessage),
   body("resetToken").notEmpty().withMessage("Reset token is required"),
-  validateRequest
+  validateRequest,
 ];
 
 const validateTotp = [
@@ -55,7 +62,13 @@ const validateTotp = [
     .isNumeric()
     .isLength({ min: 6, max: 6 })
     .withMessage("TOTP must be 6 numbers"),
-  validateRequest
+  validateRequest,
 ];
 
-export { validateSignIn, validateSignUp, validateForgotPassword, validateChangePassword, validateTotp };
+export {
+  validateSignIn,
+  validateSignUp,
+  validateForgotPassword,
+  validateChangePassword,
+  validateTotp,
+};

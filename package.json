@@ -14,7 +14,8 @@
     "lint": "eslint src/**/*.ts",
     "build-db": "ts-node src/database/build.ts",
     "seed-db": "ts-node src/database/seed.ts",
-    "dev-email": "nodemon src/email/views/serve.ts -e hbs,ts -w src/email/views"
+    "dev-email": "nodemon src/email/views/serve.ts -e hbs,ts -w src/email/views",
+    "format": "prettier --write ."
   },
   "keywords": [],
   "author": "",

@@ -15,14 +15,20 @@ const validateEmail = (email: string) => isEmail(email);
  * @param password A password to validate
  * @returns True if the password is valid
  */
-const validatePassword = (password: string, options: Partial<typeof PASSWORD_CONSTANTS> = {}) => {
+const validatePassword = (
+  password: string,
+  options: Partial<typeof PASSWORD_CONSTANTS> = {}
+) => {
   const mergedOptions = { ...PASSWORD_CONSTANTS, ...options };
 
   const metrics: boolean[] = [];
 
   metrics.push(password.length >= mergedOptions.minPasswordLength);
   metrics.push(password.length <= mergedOptions.maxPasswordLength);
-  metrics.push(password.replace(mergedOptions.nonSpecialCharacters, "").length >= mergedOptions.minSpecialCharacters);
+  metrics.push(
+    password.replace(mergedOptions.nonSpecialCharacters, "").length >=
+      mergedOptions.minSpecialCharacters
+  );
   metrics.push(password.replace(/\D/g, "").length >= mergedOptions.minNumbers);
 
   if (mergedOptions.mustVaryCase) {
