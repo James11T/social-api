@@ -1,10 +1,18 @@
-import nodemailer from "nodemailer";
 import AWS from "aws-sdk";
-import templates from "../email/templates";
+import nodemailer from "nodemailer";
 import { RUNTIME_CONSTANTS, WEB_CONSTANTS } from "../config";
 import type { Attachment } from "nodemailer/lib/mailer";
 
 const { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, WEB_DOMAIN } = process.env;
+
+interface EmailOptions {
+  name: string;
+  user: string;
+  subject: string;
+  text?: string;
+  html?: string;
+  attachments?: Attachment[];
+}
 
 AWS.config.update({
   accessKeyId: AWS_ACCESS_KEY_ID,
@@ -18,15 +26,6 @@ const transporter = nodemailer.createTransport({
   SES: ses,
   sendingRate: 1
 });
-
-interface EmailOptions {
-  name: string;
-  user: string;
-  subject: string;
-  text?: string;
-  html?: string;
-  attachments?: Attachment[];
-}
 
 const defaultOptions: EmailOptions = {
   name: "Kakapo",
@@ -60,31 +59,5 @@ const sendEmail = async (to: string | string[], options: Partial<EmailOptions>) 
   // TODO: Test
 };
 
-/**
- * Render from a template and send an email
- *
- * @param to Email recipient(s)
- * @param templateName Email template name
- * @param templateContext Context to pass to the template
- * @param options Additional email options
- */
-const sendTemplate = async (
-  to: string | string[],
-  templateName: string,
-  templateContext: any,
-  options: Partial<EmailOptions>
-) => {
-  const loadedTemplate = templates[templateName];
-  const html = loadedTemplate.render(templateContext);
-  const text = loadedTemplate.fallback(templateContext);
-
-  await sendEmail(to, {
-    ...options,
-    html,
-    text
-  });
-
-  // TODO: Test
-};
-
-export { sendEmail, sendTemplate };
+export { sendEmail };
+export type { EmailOptions };

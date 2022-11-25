@@ -1,11 +1,14 @@
 import fs from "fs";
 import handlebars from "handlebars";
+import { sendEmail } from "../services/ses";
+import { IPToCountryEmoji } from "../utils/ip";
 import type { TemplateDelegate } from "handlebars";
+import type { EmailOptions } from "../services/ses";
 
 const NO_FALLBACK =
   "This email is HTML only. If you can't see the HTML version of this email then you may need to update your email client preferences.";
 
-const TEMPLATE_DIR = "src/views/";
+const TEMPLATE_DIR = "src/email/views/";
 
 interface APITemplate {
   render: TemplateDelegate;
@@ -80,9 +83,41 @@ const loadTemplates = () => {
   // TODO: Test
 };
 
+/**
+ * Render from a template and send an email
+ *
+ * @param to Email recipient(s)
+ * @param templateName Email template name
+ * @param templateContext Context to pass to the template
+ * @param options Additional email options
+ */
+const sendTemplate = async (
+  to: string | string[],
+  templateName: string,
+  templateContext: any,
+  options: Partial<EmailOptions>
+) => {
+  const loadedTemplate = templates[templateName];
+
+  if (templateContext.ip) {
+    const ipFlag = IPToCountryEmoji(templateContext.ip);
+    if (ipFlag.ok) templateContext = { ...templateContext, flag: ipFlag.val };
+  }
+
+  const html = loadedTemplate.render({ ...templateContext });
+  const text = loadedTemplate.fallback(templateContext);
+
+  await sendEmail(to, {
+    ...options,
+    html,
+    text
+  });
+
+  // TODO: Test
+};
+
 const templates = loadTemplates();
 
-export default templates;
+export { sendTemplate };
 
-// I never want to in my life ever have to make HTML emails ever again.
 // LATO and Raleway

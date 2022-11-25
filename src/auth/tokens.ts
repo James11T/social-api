@@ -7,8 +7,6 @@ import type { Result } from "ts-results";
 import type { User } from "../models/user.model";
 import type { JWTRefreshToken, JWTAccessToken } from "../types";
 
-const { JWT_SECRET } = process.env;
-
 type GENERATE_ACCESS_TOKEN_ERRORS =
   | "REFRESH_TOKEN_EXPIRED"
   | "FAILED_TO_GET_REFRESH_TOKEN"
@@ -20,6 +18,7 @@ const generateAccessToken = async (
   refreshToken: JWTRefreshToken
 ): Promise<Result<JWTAccessToken, GENERATE_ACCESS_TOKEN_ERRORS>> => {
   if (refreshToken.exp < getEpoch()) return Err("REFRESH_TOKEN_EXPIRED");
+  
   let DBRefreshToken: RefreshToken | null;
 
   try {

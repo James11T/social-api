@@ -1,10 +1,12 @@
+import "dotenv/config";
 import fs from "fs";
 import express from "express";
-import assets from "./assets.json";
 import handlebars from "handlebars";
+import format from "../../utils/console";
 
-const PORT = 5000;
-const TEMPLATE_DIR = "src/views/";
+const { EMAIL_DEV_SERVER_PORT } = process.env;
+
+const TEMPLATE_DIR = "src/email/views/";
 
 handlebars.registerPartial("base", handlebars.compile(fs.readFileSync(`${TEMPLATE_DIR}base.hbs`, "utf8")));
 
@@ -32,9 +34,11 @@ app.get("/:template", (req, res) => {
 
   if (!(template in templates)) return res.status(404).send("Invalid template");
 
-  return res.send(templates[template]({ name: "Username", request: { ip: "127.0.0.1", flag: "🌍" }, assets }));
+  return res.send(templates[template]({ name: "Username", request: { ip: "127.0.0.1", flag: "🌍" } }));
 });
 
-app.listen(PORT, () => {
-  console.log(`Listening on ${PORT}`);
+app.listen(EMAIL_DEV_SERVER_PORT, () => {
+  const url = `http://localhost:${EMAIL_DEV_SERVER_PORT}/`;
+  console.log(`Listening on ${EMAIL_DEV_SERVER_PORT}`);
+  console.log(`Access via ${format.link(url)}`);
 });

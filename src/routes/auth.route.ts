@@ -1,6 +1,6 @@
 import { Router } from "express";
 import {
-  signInController,
+  authenticateController,
   signUpController,
   forgotPasswordController,
   whoAmIController
@@ -9,7 +9,7 @@ import { validateSignIn, validateSignUp, validateForgotPassword } from "../valid
 
 const authRouter = Router();
 
-authRouter.post("/signin", validateSignIn, signInController);
+authRouter.post("/authenticate", validateSignIn, authenticateController); // TODO: Validation
 authRouter.post("/signup", validateSignUp, signUpController);
 authRouter.get(
   "/:id/forgot-password/",

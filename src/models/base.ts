@@ -1,5 +1,5 @@
-import { BaseEntity } from "typeorm";
 import { Ok, Err } from "ts-results";
+import { BaseEntity } from "typeorm";
 import type { Result } from "ts-results";
 import type { SaveOptions } from "typeorm";
 
@@ -8,7 +8,7 @@ class BaseModel extends BaseEntity {
     super();
   }
 
-  async saveProxy(options?: SaveOptions): Promise<Result<this, "FAILED_TO_SAVE">> {
+  async pcallSave(options?: SaveOptions): Promise<Result<this, "FAILED_TO_SAVE">> {
     try {
       const res = await this.save(options);
       return Ok(res);

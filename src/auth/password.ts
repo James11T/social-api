@@ -1,7 +1,7 @@
 import argon2 from "argon2";
 import jwt from "jsonwebtoken";
 import { Ok, Err } from "ts-results";
-import { sendTemplate } from "../services/ses";
+import { sendTemplate } from "../email/templates";
 import { HASHING_CONSTANTS, WEB_CONSTANTS } from "../config";
 import type { Result } from "ts-results";
 import type { User } from "../models";
@@ -44,7 +44,7 @@ const verifyPassword = async (password: string, hash: string): Promise<boolean> 
 
 const invokePasswordReset = async (user: User) => {
   const resetPayload = { id: user.id };
-  const resetJWT = jwt.sign(resetPayload, JWT_SECRET);
+  const resetJWT = jwt.sign(resetPayload, JWT_SECRET); // TODO: Replace with generic sign
   const resetLink = `${WEB_CONSTANTS.URL}change-password?c=${resetJWT}`;
 
   await sendTemplate(

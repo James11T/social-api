@@ -28,15 +28,6 @@ export class UserTOTP extends BaseModel {
     this.id = this.id ?? uuid();
   }
 
-  public static async byId(id: string, user?: User): Promise<Result<UserTOTP | null, "FAILED_TO_GET_TOTP">> {
-    try {
-      const userTotp = await UserTOTP.findOneBy({ id, user: user ? { id: user.id } : undefined });
-      return Ok(userTotp);
-    } catch (err) {
-      return Err("FAILED_TO_GET_TOTP");
-    }
-  }
-
   public checkCode(token: string): Result<boolean, "INVALID_TOTP" | "FAILED_TO_VERIFY_TOTP"> {
     if (token.length < 6) return Err("INVALID_TOTP");
 
@@ -46,6 +37,15 @@ export class UserTOTP extends BaseModel {
     } catch (err) {
       console.error(err);
       return Err("FAILED_TO_VERIFY_TOTP");
+    }
+  }
+
+  public static async byId(id: string, user?: User): Promise<Result<UserTOTP | null, "FAILED_TO_GET_TOTP">> {
+    try {
+      const userTotp = await UserTOTP.findOneBy({ id, user: user ? { id: user.id } : undefined });
+      return Ok(userTotp);
+    } catch (err) {
+      return Err("FAILED_TO_GET_TOTP");
     }
   }
 }

@@ -1,9 +1,7 @@
 import chalk from "chalk";
-import geoip from "geoip-country";
+import { IPToCountry } from "../utils/ip";
 import { colorizeHTTPCode } from "../utils/strings";
 import type { Request, Response, NextFunction } from "express";
-
-const FAIL_COUNTRY_CODE = "ZZ";
 
 const setRealIp = (req: Request, res: Response, next: NextFunction) => {
   let ip = req.header("x-real-ip") ?? req.header("cf-connecting-ip") ?? req.header("x-forwarded-for");
@@ -16,20 +14,8 @@ const setRealIp = (req: Request, res: Response, next: NextFunction) => {
 const setRequestCountry = (req: Request, res: Response, next: NextFunction) => {
   const ip = req.realIp;
 
-  if (!ip) {
-    req.country = FAIL_COUNTRY_CODE;
-    return next();
-  }
-
-  let country;
-  try {
-    const geoData = geoip.lookup(ip);
-
-    if (!geoData) throw new Error("No geo data for IP");
-    req.country = geoData.country;
-  } catch (err) {
-    country = FAIL_COUNTRY_CODE;
-  }
+  const countryCode = IPToCountry(ip);
+  req.country = countryCode;
 
   next();
 };
@@ -42,6 +28,7 @@ const methods: { [key: string]: string } = {
   PUT: chalk.bold.yellow("PUT"),
   PATCH: chalk.bold.yellow("PATCH")
 };
+
 const logRequest = (req: Request, res: Response, next: NextFunction) => {
   res.on("finish", () => {
     const output = [ping, methods[req.method], req.realIp, req.originalUrl, "->", colorizeHTTPCode(res.statusCode)];

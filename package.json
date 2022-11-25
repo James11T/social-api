@@ -14,7 +14,7 @@
     "lint": "eslint src/**/*.ts",
     "build-db": "ts-node src/database/build.ts",
     "seed-db": "ts-node src/database/seed.ts",
-    "dev-email": "nodemon src/email/views/serve.ts -e hbs,ts -w src/views"
+    "dev-email": "nodemon src/email/views/serve.ts -e hbs,ts -w src/email/views"
   },
   "keywords": [],
   "author": "",
@@ -70,6 +70,7 @@
     "@typescript-eslint/parser": "^5.42.0",
     "cross-env": "^7.0.3",
     "nodemon": "^2.0.19",
+    "prettier": "^2.8.0",
     "supertest": "^6.2.3",
     "ts-jest": "^28.0.1",
     "ts-node": "^10.9.1",

@@ -1,24 +1,19 @@
-import qr from "qrcode";
-import jwt from "jsonwebtoken";
-import { User, UserTOTP } from "../models";
-import { signToken } from "../utils/jwt";
-import { sendTemplate } from "../services/ses";
-import { generateRefreshToken } from "../auth/tokens";
-import { countryCodeEmoji } from "country-code-emoji";
 import {
-  APIBadRequestError,
+  APIServerError,
   APIConflictError,
   APINotFoundError,
-  APIServerError,
+  APIBadRequestError,
   APIUnauthorizedError
 } from "../errors/api";
+import { User } from "../models";
+import { sendTemplate } from "../email/templates";
+import { generateAccessToken, generateRefreshToken } from "../auth/tokens";
+import { decodeSignedToken, signToken } from "../utils/jwt";
 import { getVerificationToken } from "../email/verification";
-import { WEB_CONSTANTS, RUNTIME_CONSTANTS, TOTP_CONSTANTS } from "../config";
+import { WEB_CONSTANTS, RUNTIME_CONSTANTS } from "../config";
 import { hashPassword, invokePasswordReset, verifyPassword } from "../auth/password";
+import type { JWTRefreshToken } from "../types";
 import type { NextFunction, Request, Response } from "express";
-import { authenticator } from "otplib";
-
-const { JWT_SECRET } = process.env;
 
 interface SignInBody {
   email: string;
@@ -31,7 +26,11 @@ interface SignInBody {
  * Methods: POST
  *
  */
-const signInController = async (req: Request<unknown, unknown, SignInBody>, res: Response, next: NextFunction) => {
+const authenticateController = async (
+  req: Request<unknown, unknown, SignInBody>,
+  res: Response,
+  next: NextFunction
+) => {
   const user = await User.findOne({ where: { email: req.body.email } });
 
   const failError = new APINotFoundError("No user with the given email exists.");
@@ -42,12 +41,10 @@ const signInController = async (req: Request<unknown, unknown, SignInBody>, res:
   if (!passwordsMatch) return next(failError);
 
   const [refreshToken] = await generateRefreshToken(user, "auth");
-  const signedToken = await signToken(refreshToken);
+  const signedToken = signToken(refreshToken);
 
   if (signedToken.err) {
-    if (signedToken.val === "SIGN_TOKEN_ERROR") {
-      return next(new APIServerError("Failed to start new user session"));
-    }
+    return next(new APIServerError("Failed to start new user session"));
   }
 
   return res.json({
@@ -60,6 +57,43 @@ const signInController = async (req: Request<unknown, unknown, SignInBody>, res:
   });
 
   // TODO: Test
+}; // POST
+
+const refreshAccessController = async (req: Request, res: Response, next: NextFunction) => {
+  const { refreshToken, userId } = req.body;
+
+  const user = await User.fromId(userId);
+
+  if (user.err) return next(new APIServerError("Failed to fetch user"));
+  if (!user.val) return next(new APINotFoundError("User not found"));
+
+  const tokenResult = decodeSignedToken<JWTRefreshToken>(refreshToken);
+
+  if (tokenResult.err) return next(new APIUnauthorizedError(tokenResult.val));
+
+  if (tokenResult.val.sub !== user.val.id) return next(new APIUnauthorizedError("Invalid refresh token"));
+
+  const accessToken = await generateAccessToken(user.val, tokenResult.val);
+
+  if (accessToken.err) {
+    if (accessToken.val === "FAILED_TO_GET_REFRESH_TOKEN") return next(new APIServerError(accessToken.val));
+
+    return next(new APIBadRequestError(accessToken.val));
+  }
+
+  const accessJWT = signToken(accessToken);
+
+  if (accessJWT.err) return 
+
+  return res.json({});
+
+  /**
+   * 1. Get refresh token ✓
+   * 2. Decode token ✓
+   * 3. Check expiry ✓
+   * 4. Generate access token
+   * 5. Return to user
+   */
 }; // POST
 
 interface SignUpBody {
@@ -96,7 +130,7 @@ const signUpController = async (req: Request<unknown, unknown, SignUpBody>, res:
   newUser.registeredAt = new Date();
   newUser.passwordHash = passwordHash.val;
 
-  const saveResult = await newUser.saveProxy();
+  const saveResult = await newUser.pcallSave();
 
   if (saveResult.err) {
     return next(new APIServerError("Failed to create user"));
@@ -112,7 +146,9 @@ const signUpController = async (req: Request<unknown, unknown, SignUpBody>, res:
       },
       { subject: "Confirm your email" }
     );
-  } catch {
+  } catch (err) {
+    console.error(err);
+
     return next(new APIServerError("Failed to send confirmation email"));
   }
 
@@ -163,4 +199,4 @@ const whoAmIController = async (req: Request, res: Response, next: NextFunction)
   // TODO: Test
 };
 
-export { signInController, signUpController, forgotPasswordController, whoAmIController };
+export { authenticateController, signUpController, forgotPasswordController, whoAmIController };

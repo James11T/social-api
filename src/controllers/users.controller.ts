@@ -1,23 +1,15 @@
 import qr from "qrcode";
 import { Like } from "typeorm";
-import { authenticator } from "otplib";
 import { Ok, Err } from "ts-results";
+import { authenticator } from "otplib";
 import { TOTP_CONSTANTS } from "../config";
-import { sendTemplate } from "../services/ses";
+import { sendTemplate } from "../email/templates";
 import { countryCodeEmoji } from "country-code-emoji";
 import { Friendship, User, UserTOTP } from "../models";
 import { FriendshipState } from "../models/friendship.model";
-import {
-  APIBadRequestError,
-  APIServerError,
-  APINotFoundError,
-  APIUnauthorizedError,
-  APIBaseError
-} from "../errors/api";
+import { APIBadRequestError, APIServerError, APINotFoundError, APIUnauthorizedError } from "../errors/api";
 import type { Result } from "ts-results";
 import type { Request, Response, NextFunction } from "express";
-
-const { JWT_SECRET } = process.env;
 
 interface FilterQuery {
   username: string;
@@ -98,8 +90,6 @@ const getFriendRequestsController = async (req: Request, res: Response, next: Ne
 const sendFriendRequestsController = async (req: Request, res: Response, next: NextFunction) => {
   const { from: fromId, to: toId } = req.body;
 
-  if (fromId === toId) return next(new APIBadRequestError("Cannot send a friend request to yourself"));
-
   const fromUser = await User.fromId(fromId);
   const toUser = await User.fromId(toId);
 
@@ -107,7 +97,7 @@ const sendFriendRequestsController = async (req: Request, res: Response, next: N
   if (!fromUser.val) return next(new APINotFoundError("Friend request sender not found"));
   if (!toUser.val) return next(new APINotFoundError("Friend request recipient not found"));
 
-  // Double check incase of formatting
+  // Double check in case of formatting
   if (fromUser.val.id === toUser.val.id)
     return next(new APIBadRequestError("Cannot send a friend request to yourself"));
 
@@ -116,7 +106,7 @@ const sendFriendRequestsController = async (req: Request, res: Response, next: N
   if (friendshipState.err) return next(new APIServerError("Failed to check friendship status"));
 
   if (friendshipState.val === FriendshipState.PENDING) {
-    return next(new APIBadRequestError("You already have a friend request from this user"));
+    return next(new APIBadRequestError("You already have a pending friend request with this user"));
   } else if (friendshipState.val === FriendshipState.FRIENDS) {
     return next(new APIBadRequestError("You are already friends with this user"));
   }
@@ -164,7 +154,7 @@ const isUsernameTakenController = async (req: Request, res: Response, next: Next
   const user = await User.fromUsername(username);
   if (user.err) return next(new APIServerError("Failed to check username"));
 
-  return res.json({ available: Boolean(user.val) });
+  return res.json({ available: !user.val });
 
   // TODO: Test
 }; // GET
@@ -201,7 +191,7 @@ const create2FA = async (req: Request, res: Response, next: NextFunction) => {
     return next(new APIServerError("Failed to generate 2FA QR code"));
   }
 
-  return res.json({ qr: userQR, secret });
+  return res.json({ qr: userQR, secret, totpId: newTOTP.id });
   // TODO: Test
 }; // GET
 
@@ -223,7 +213,7 @@ const setTotpActive = async (
   if (!isValid.val) return Err(new APIUnauthorizedError("Invalid TOTP"));
 
   userTOTP.val.activated = active;
-  const saveResult = await userTOTP.val.saveProxy();
+  const saveResult = await userTOTP.val.pcallSave();
   if (saveResult.err) return Err(new APIServerError("Failed to update TOTP settings"));
 
   return Ok([user.val, userTOTP.val]);
@@ -251,14 +241,12 @@ const activate2FA = async (
       "2FAEnabled",
       {
         name: user.username,
-        request: {
-          ip: req.realIp,
-          flag: countryCodeEmoji(req.country)
-        }
+        ip: req.realIp
       },
       { subject: "A new 2FA source has been activated on your account" }
     );
-  } catch {
+  } catch (err) {
+    console.error(err);
     console.error("Failed to send email");
   }
 
@@ -289,10 +277,7 @@ const disable2FA = async (
       "2FADisabled",
       {
         name: user.username,
-        request: {
-          ip: req.realIp,
-          flag: countryCodeEmoji(req.country)
-        }
+        ip: req.realIp
       },
       { subject: "2FA Disabled" }
     );
@@ -305,6 +290,22 @@ const disable2FA = async (
   // TODO: Test
 }; // POST
 
+const getTOTP_IDs = async (req: Request, res: Response, next: NextFunction) => {
+  const { id } = req.params;
+
+  const user = await User.fromId(id);
+  if (user.err) return next(new APIServerError("Failed to fetch user"));
+  if (!user.val) return next(new APINotFoundError("User not found"));
+
+  try {
+    const userTOTPs = await UserTOTP.find({ where: { user: { id: user.val.id }, activated: true } });
+    return res.json(userTOTPs.map((userTOTP) => ({ totpId: userTOTP.id })));
+  } catch (err) {
+    console.error(err);
+    return next(new APIServerError("Failed to fetch 2FA"));
+  }
+};
+
 export {
   filterUserController,
   getUserController,
@@ -314,5 +315,6 @@ export {
   isUsernameTakenController,
   create2FA,
   activate2FA,
-  disable2FA
+  disable2FA,
+  getTOTP_IDs
 };

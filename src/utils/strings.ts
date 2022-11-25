@@ -19,7 +19,6 @@ const countOccurrences = (str: string, match: RegExp): number => {
  * Strip the last file extension from a filename
  *
  * selfie.png -> selfie
- *
  * .env -> .env
  *
  * @param filename Any filename, with or without extension

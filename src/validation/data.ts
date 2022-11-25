@@ -1,6 +1,5 @@
 import isEmail from "validator/lib/isEmail";
 import { PASSWORD_CONSTANTS, USERNAME_CONSTANTS } from "../config";
-import type { PasswordRequirements } from "../config";
 
 /**
  * Check if a email is in valid format
@@ -16,8 +15,8 @@ const validateEmail = (email: string) => isEmail(email);
  * @param password A password to validate
  * @returns True if the password is valid
  */
-const validatePassword = (password: string, options: Partial<PasswordRequirements> = {}) => {
-  const mergedOptions: PasswordRequirements = { ...PASSWORD_CONSTANTS, ...options };
+const validatePassword = (password: string, options: Partial<typeof PASSWORD_CONSTANTS> = {}) => {
+  const mergedOptions = { ...PASSWORD_CONSTANTS, ...options };
 
   const metrics: boolean[] = [];
 

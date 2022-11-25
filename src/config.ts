@@ -7,22 +7,13 @@ const { NODE_ENV, SEND_EMAILS_IN_DEV } = process.env;
 const isDevelopmentEnv = NODE_ENV.toUpperCase() === "DEVELOPMENT";
 const sendEmailsInDev = SEND_EMAILS_IN_DEV === "true";
 
-export interface PasswordRequirements {
-  minPasswordLength: number;
-  maxPasswordLength: number;
-  minSpecialCharacters: number;
-  minNumbers: number;
-  mustVaryCase: boolean;
-  nonSpecialCharacters: RegExp;
-}
-
 export const HASHING_CONSTANTS = {
   SALT_SIZE_BYTES: 16,
   HASH_LENGTH_BYTES: 32,
   HASHING_FUNCTION: argon2id
 };
 
-export const PASSWORD_CONSTANTS: PasswordRequirements = {
+export const PASSWORD_CONSTANTS = {
   minPasswordLength: 8,
   maxPasswordLength: 256,
   minSpecialCharacters: 0,
