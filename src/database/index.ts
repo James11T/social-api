@@ -24,7 +24,7 @@ export const AppDataSource = new DataSource({
   password: DB_PASSWORD,
   database: DB_DATABASE,
   synchronize: true,
-  logging: true,
+  logging: false,
   entities: [User, Friendship, Post, PostMedia, UserTOTP, RefreshToken],
   subscribers: [],
   migrations: [],

@@ -33,18 +33,17 @@ handlebars.registerPartial(
  */
 const loadFallback = (dirName: string) => {
   let fallback: string;
-  try {
+
+  if (!fs.existsSync(dirName)) {
+    fallback = NO_FALLBACK;
+  } else {
     fallback = fs.readFileSync(
       `${TEMPLATE_DIR}${dirName}/fallback.txt`,
       "utf8"
     );
-  } catch (error) {
-    fallback = NO_FALLBACK;
   }
 
   return handlebars.compile(fallback);
-
-  // TODO: Test
 };
 
 /**

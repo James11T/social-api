@@ -3,8 +3,8 @@ import jwt from "jsonwebtoken";
 import { Ok, Err } from "ts-results";
 import { sendTemplate } from "../email/templates";
 import { HASHING_CONSTANTS, WEB_CONSTANTS } from "../config";
-import type { Result } from "ts-results";
 import type { User } from "../models";
+import type { Result } from "ts-results";
 
 const { JWT_SECRET } = process.env;
 

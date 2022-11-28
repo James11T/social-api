@@ -1,21 +1,15 @@
 import {
   APIServerError,
-  APIConflictError,
   APINotFoundError,
   APIBadRequestError,
   APIUnauthorizedError,
 } from "../errors/api";
-import { User } from "../models";
-import { sendTemplate } from "../email/templates";
-import { generateAccessToken, generateRefreshToken } from "../auth/tokens";
+import { getEpoch } from "../utils/time";
+import { RefreshToken, User } from "../models";
 import { decodeSignedToken, signToken } from "../utils/jwt";
-import { getVerificationToken } from "../email/verification";
-import { WEB_CONSTANTS, RUNTIME_CONSTANTS } from "../config";
-import {
-  hashPassword,
-  invokePasswordReset,
-  verifyPassword,
-} from "../auth/password";
+import { invokePasswordReset, verifyPassword } from "../auth/password";
+import { RUNTIME_CONSTANTS, REFRESH_TOKEN_CONSTANTS } from "../config";
+import { generateAccessToken, generateRefreshToken } from "../auth/tokens";
 import type { JWTRefreshToken } from "../types";
 import type { NextFunction, Request, Response } from "express";
 
@@ -49,8 +43,26 @@ const authenticateController = async (
   );
   if (!passwordsMatch) return next(failError);
 
-  const [refreshToken] = await generateRefreshToken(user, "auth");
-  const signedToken = signToken(refreshToken);
+  const [refreshJWT, tokenId] = await generateRefreshToken(user, "auth");
+
+  const newRefreshToken = new RefreshToken();
+  newRefreshToken.id = tokenId;
+  newRefreshToken.subjectId = user.id;
+  newRefreshToken.expiresAt = new Date(
+    getEpoch() + REFRESH_TOKEN_CONSTANTS.TOKEN_TTL
+  );
+  newRefreshToken.issuedAt = new Date();
+  newRefreshToken.sourceIp = req.realIp;
+
+  try {
+    await newRefreshToken.save();
+  } catch (err) {
+    console.error(err);
+
+    return next(new APIServerError("Failed to save refresh token"));
+  }
+
+  const signedToken = signToken(refreshJWT);
 
   if (signedToken.err) {
     return next(new APIServerError("Failed to start new user session"));
@@ -60,6 +72,7 @@ const authenticateController = async (
     success: true,
     refreshToken: signedToken.val,
     user: {
+      id: user.id,
       email: user.email,
       username: user.username,
     },
@@ -96,87 +109,14 @@ const refreshAccessController = async (
     return next(new APIBadRequestError(accessToken.val));
   }
 
-  const accessJWT = signToken(accessToken);
+  const accessJWT = signToken(accessToken.val);
 
-  if (accessJWT.err) return;
+  if (accessJWT.err)
+    return next(new APIServerError("Failed to generate access token"));
 
-  return res.json({});
-
-  /**
-   * 1. Get refresh token ✓
-   * 2. Decode token ✓
-   * 3. Check expiry ✓
-   * 4. Generate access token
-   * 5. Return to user
-   */
-}; // POST
-
-interface SignUpBody {
-  username: string;
-  email: string;
-  password: string;
-}
-
-/**
- * Create a new user from the request body
- *
- * Methods: POST
- */
-const signUpController = async (
-  req: Request<unknown, unknown, SignUpBody>,
-  res: Response,
-  next: NextFunction
-) => {
-  if (req.user)
-    return next(new APIBadRequestError("Cannot sign up while authenticated"));
-
-  const { username, email, password } = req.body;
-
-  const getUsername = await User.fromUsername(username);
-  if (getUsername.err)
-    return next(new APIServerError("Failed to check username availability"));
-
-  if (getUsername.val)
-    return next(new APIConflictError("User ID is taken or reserved"));
-
-  const passwordHash = await hashPassword(password);
-  if (passwordHash.err) {
-    return next(new APIServerError("Failed to hash password"));
-  }
-
-  const verificationToken = getVerificationToken();
-
-  const newUser = new User();
-  newUser.username = username;
-  newUser.email = email;
-  newUser.registeredAt = new Date();
-  newUser.passwordHash = passwordHash.val;
-
-  const saveResult = await newUser.pcallSave();
-
-  if (saveResult.err) {
-    return next(new APIServerError("Failed to create user"));
-  }
-
-  try {
-    await sendTemplate(
-      email,
-      "confirmEmail",
-      {
-        name: username,
-        link: `${WEB_CONSTANTS.URL}email/verify?c=${verificationToken}`,
-      },
-      { subject: "Confirm your email" }
-    );
-  } catch (err) {
-    console.error(err);
-
-    return next(new APIServerError("Failed to send confirmation email"));
-  }
-
-  return res.json({ success: true });
-
-  // TODO: Test
+  return res.json({
+    accessToken: accessJWT.val,
+  });
 }; // POST
 
 /**
@@ -231,7 +171,7 @@ const whoAmIController = async (
 
 export {
   authenticateController,
-  signUpController,
   forgotPasswordController,
   whoAmIController,
+  refreshAccessController,
 };

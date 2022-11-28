@@ -2,9 +2,8 @@ import qr from "qrcode";
 import { Like } from "typeorm";
 import { Ok, Err } from "ts-results";
 import { authenticator } from "otplib";
-import { TOTP_CONSTANTS } from "../config";
+import { TOTP_CONSTANTS, WEB_CONSTANTS } from "../config";
 import { sendTemplate } from "../email/templates";
-import { countryCodeEmoji } from "country-code-emoji";
 import { Friendship, User, UserTOTP } from "../models";
 import { FriendshipState } from "../models/friendship.model";
 import {
@@ -12,9 +11,12 @@ import {
   APIServerError,
   APINotFoundError,
   APIUnauthorizedError,
+  APIConflictError,
 } from "../errors/api";
 import type { Result } from "ts-results";
 import type { Request, Response, NextFunction } from "express";
+import { hashPassword } from "../auth/password";
+import { getVerificationToken } from "../email/verification";
 
 interface FilterQuery {
   username: string;
@@ -68,6 +70,74 @@ const getUserController = async (
 
   return res.json(user.val);
 }; // GET
+
+interface SignUpBody {
+  username: string;
+  email: string;
+  password: string;
+}
+
+/**
+ * Create a new user from the request body
+ *
+ * Methods: POST
+ */
+const createUserController = async (
+  req: Request<unknown, unknown, SignUpBody>,
+  res: Response,
+  next: NextFunction
+) => {
+  if (req.user)
+    return next(new APIBadRequestError("Cannot sign up while authenticated"));
+
+  const { username, email, password } = req.body;
+
+  const getUsername = await User.fromUsername(username);
+  if (getUsername.err)
+    return next(new APIServerError("Failed to check username availability"));
+
+  if (getUsername.val)
+    return next(new APIConflictError("User ID is taken or reserved"));
+
+  const passwordHash = await hashPassword(password);
+  if (passwordHash.err) {
+    return next(new APIServerError("Failed to hash password"));
+  }
+
+  const verificationToken = getVerificationToken();
+
+  const newUser = new User();
+  newUser.username = username;
+  newUser.email = email;
+  newUser.registeredAt = new Date();
+  newUser.passwordHash = passwordHash.val;
+
+  const saveResult = await newUser.pcallSave();
+
+  if (saveResult.err) {
+    return next(new APIServerError("Failed to create user"));
+  }
+
+  try {
+    await sendTemplate(
+      email,
+      "confirmEmail",
+      {
+        name: username,
+        link: `${WEB_CONSTANTS.URL}email/verify?c=${verificationToken}`,
+      },
+      { subject: "Confirm your email" }
+    );
+  } catch (err) {
+    console.error(err);
+
+    return next(new APIServerError("Failed to send confirmation email"));
+  }
+
+  return res.json({ success: true });
+
+  // TODO: Test
+}; // POST
 
 /**
  * Get all friend requests for a user
@@ -360,6 +430,7 @@ const getTOTP_IDs = async (req: Request, res: Response, next: NextFunction) => {
 export {
   filterUserController,
   getUserController,
+  createUserController,
   getFriendRequestsController,
   sendFriendRequestsController,
   getUserFriendsController,

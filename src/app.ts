@@ -9,6 +9,8 @@ import { logRequest } from "./middleware/pre.middleware";
 
 const app = express();
 
+app.use;
+
 app.use(setRequestMeta);
 app.use(express.urlencoded({ extended: true })); // Parse forms
 app.use(express.json()); // Parse JSON bodies
@@ -22,5 +24,7 @@ app.disable("x-powered-by"); // Disable X-Powered-By header
 app.use("/api/v1", baseRouter);
 
 app.use(errorHandler);
+
+app.use("*", (req, res) => res.status(404).json({ error: "unknown route" }));
 
 export default app;

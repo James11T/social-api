@@ -4,13 +4,13 @@ import type { Result } from "ts-results";
 
 const { JWT_SECRET } = process.env;
 
-type SIGN_TOKEN_ERRORS = "SIGN_TOKEN_ERROR";
-
-const signToken = (payload: any): Result<string, SIGN_TOKEN_ERRORS> => {
+const signToken = (payload: any): Result<string, "SIGN_TOKEN_ERROR"> => {
   try {
     const token = JWT.sign(payload, JWT_SECRET);
     return Ok(token);
-  } catch {
+  } catch (err) {
+    console.error(err);
+
     return Err("SIGN_TOKEN_ERROR");
   }
 };

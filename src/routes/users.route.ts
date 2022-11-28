@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   filterUserController,
   getUserController,
+  createUserController,
   getFriendRequestsController,
   sendFriendRequestsController,
   getUserFriendsController,
@@ -19,6 +20,8 @@ import {
 } from "../validation/routes/auth.validation";
 
 const usersRouter = Router(); // /users
+
+usersRouter.post("/", createUserController);
 
 usersRouter.get("/", validateUserQuery, filterUserController);
 usersRouter.get("/:id", getUserController);

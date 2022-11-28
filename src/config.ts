@@ -52,11 +52,11 @@ export const POST_CONSTANTS = {
 };
 
 export const REFRESH_TOKEN_CONSTANTS = {
-  TOKEN_TTL: parseDuration("60day", "ms"),
+  TOKEN_TTL: parseDuration("60day", "s"),
 };
 
 export const ACCESS_TOKEN_CONSTANTS = {
-  TOKEN_TTL: parseDuration("1hr", "ms"),
+  TOKEN_TTL: parseDuration("1hr", "s"),
 };
 
 export const TOTP_CONSTANTS = {
