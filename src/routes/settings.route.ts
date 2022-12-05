@@ -2,7 +2,7 @@ import { Router } from "express";
 import {
   getSettingsController,
   getSpecificSettingController,
-  setSettingController,
+  setSettingController
 } from "../controllers/settings.controller";
 
 const settingsRouter = Router();

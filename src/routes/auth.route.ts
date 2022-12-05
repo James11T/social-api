@@ -3,11 +3,11 @@ import {
   authenticateController,
   forgotPasswordController,
   whoAmIController,
-  refreshAccessController,
+  refreshAccessController
 } from "../controllers/auth.controller";
 import {
   validateSignIn,
-  validateForgotPassword,
+  validateForgotPassword
 } from "../validation/routes/auth.validation";
 
 const authRouter = Router();

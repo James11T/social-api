@@ -11,7 +11,7 @@ import {
   APIServerError,
   APINotFoundError,
   APIUnauthorizedError,
-  APIConflictError,
+  APIConflictError
 } from "../errors/api";
 import type { Result } from "ts-results";
 import type { Request, Response, NextFunction } from "express";
@@ -40,9 +40,9 @@ const filterUserController = async (
   try {
     const users = await User.find({
       where: {
-        username: Like(`%${username}%`),
+        username: Like(`%${username}%`)
       },
-      take: limit,
+      take: limit
     });
     return res.json(users);
   } catch (err) {
@@ -67,6 +67,8 @@ const getUserController = async (
   const user = await User.fromId(id);
   if (user.err) return next(new APIServerError("Failed to get user"));
   if (!user.val) return next(new APINotFoundError("User not found"));
+
+  await user.val.isFriendsWith(user.val);
 
   return res.json(user.val);
 }; // GET
@@ -124,7 +126,7 @@ const createUserController = async (
       "confirmEmail",
       {
         name: username,
-        link: `${WEB_CONSTANTS.URL}email/verify?c=${verificationToken}`,
+        link: `${WEB_CONSTANTS.URL}email/verify?c=${verificationToken}`
       },
       { subject: "Confirm your email" }
     );
@@ -176,7 +178,8 @@ const sendFriendRequestsController = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { from: fromId, to: toId } = req.body;
+  const { id: fromId } = req.params;
+  const { to: toId } = req.body;
 
   const fromUser = await User.fromId(fromId);
   const toUser = await User.fromId(toId);
@@ -360,7 +363,7 @@ const activate2FA = async (
       "2FAEnabled",
       {
         name: user.username,
-        ip: req.realIp,
+        ip: req.realIp
       },
       { subject: "A new 2FA source has been activated on your account" }
     );
@@ -396,7 +399,7 @@ const disable2FA = async (
       "2FADisabled",
       {
         name: user.username,
-        ip: req.realIp,
+        ip: req.realIp
       },
       { subject: "2FA Disabled" }
     );
@@ -418,7 +421,7 @@ const getTOTP_IDs = async (req: Request, res: Response, next: NextFunction) => {
 
   try {
     const userTOTPs = await UserTOTP.find({
-      where: { user: { id: user.val.id }, activated: true },
+      where: { user: { id: user.val.id }, activated: true }
     });
     return res.json(userTOTPs.map((userTOTP) => ({ totpId: userTOTP.id })));
   } catch (err) {
@@ -438,5 +441,5 @@ export {
   create2FA,
   activate2FA,
   disable2FA,
-  getTOTP_IDs,
+  getTOTP_IDs
 };

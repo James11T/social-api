@@ -12,7 +12,7 @@ const generateUser = (index: number) => ({
   about: `User #${index}`,
   email: `user${index}@kakaposocial.com`,
   registeredAt: new Date(),
-  passwordHash: "abc123",
+  passwordHash: "abc123"
 });
 
 const users = [
@@ -21,7 +21,7 @@ const users = [
   generateUser(2),
   generateUser(3),
   generateUser(4),
-  generateUser(5),
+  generateUser(5)
 ];
 
 const seed = async () => {

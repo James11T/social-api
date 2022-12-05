@@ -15,7 +15,7 @@ const validateSignIn = [
     .isNumeric()
     .isLength({ min: 6, max: 6 })
     .withMessage("TOTP is in invalid format"),
-  validateRequest,
+  validateRequest
 ];
 
 const validateSignUp = [
@@ -36,12 +36,12 @@ const validateSignUp = [
     .withMessage("Password cannot be empty")
     .custom(passwordVerifier)
     .withMessage(passwordErrorMessage),
-  validateRequest,
+  validateRequest
 ];
 
 const validateForgotPassword = [
   param("email").exists().notEmpty(),
-  validateRequest,
+  validateRequest
 ];
 
 const validateChangePassword = [
@@ -52,7 +52,7 @@ const validateChangePassword = [
     .custom(passwordVerifier)
     .withMessage(passwordErrorMessage),
   body("resetToken").notEmpty().withMessage("Reset token is required"),
-  validateRequest,
+  validateRequest
 ];
 
 const validateTotp = [
@@ -62,7 +62,7 @@ const validateTotp = [
     .isNumeric()
     .isLength({ min: 6, max: 6 })
     .withMessage("TOTP must be 6 numbers"),
-  validateRequest,
+  validateRequest
 ];
 
 export {
@@ -70,5 +70,5 @@ export {
   validateSignUp,
   validateForgotPassword,
   validateChangePassword,
-  validateTotp,
+  validateTotp
 };

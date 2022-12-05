@@ -7,7 +7,7 @@
  */
 const getEpoch = ({
   date,
-  truncate = false,
+  truncate = false
 }: { date?: Date; truncate?: boolean } = {}): number => {
   const now = Number(date ? date : new Date()) / 1000;
   if (truncate) return Math.floor(now);

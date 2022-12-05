@@ -9,14 +9,16 @@ const errorHandler = (
 ) => {
   if (typeof err === "string") {
     const errorCodes = err.match(/^([45]\d\d)_(.+)$/); // Split 404_ERROR into 404_ERROR, 404, and ERROR
-    if (!errorCodes) return res.status(500).json({ error: "Unexpected error" });
+    if (!errorCodes || errorCodes.length < 3)
+      return res.status(500).json({ error: "Unexpected error" });
     const [_, code, error] = errorCodes;
     return res.status(Number(code)).json({ error });
   } else if (err instanceof APIBaseError) {
     return res.status(err.status).json(err.toJSON());
   } else if (err instanceof SyntaxError) {
+    // Usually when express.json fails
     return res.status(400).json({
-      error: "The supplied data was malformed",
+      error: "The supplied data was malformed"
     });
   }
 

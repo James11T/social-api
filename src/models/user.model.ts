@@ -12,6 +12,7 @@ import {
   OneToMany,
   BeforeInsert,
   FindOptionsWhere,
+  Brackets
 } from "typeorm";
 import type { Result } from "ts-results";
 import type { Relation, FindOneOptions } from "typeorm";
@@ -69,7 +70,7 @@ export class User extends BaseModel {
   > {
     const userTOTPs = await UserTOTP.find({
       relations: ["user"],
-      where: { id: this.id, activated: true },
+      where: { id: this.id, activated: true }
     });
     if (userTOTPs.length === 0) return Err("NO_ACTIVE_2FA");
 
@@ -86,7 +87,7 @@ export class User extends BaseModel {
   async has2FA(): Promise<boolean> {
     const userTOTPs = await UserTOTP.find({
       relations: ["user"],
-      where: { id: this.id, activated: true },
+      where: { id: this.id, activated: true }
     });
     return userTOTPs.length > 0;
   }
@@ -121,8 +122,8 @@ export class User extends BaseModel {
       const FRs = await Friendship.find({
         where: {
           accepted: false,
-          ...query,
-        },
+          ...query
+        }
       });
       return Ok(FRs);
     } catch (err) {
@@ -133,14 +134,43 @@ export class User extends BaseModel {
 
   public async getIncomingFriendRequests() {
     return this.getFriendRequests({
-      userToId: this.id,
+      userToId: this.id
     });
   }
 
   public async getOutgoingFriendRequests() {
     return this.getFriendRequests({
-      userFromId: this.id,
+      userFromId: this.id
     });
+  }
+
+  public async isFriendsWith(
+    friend: User
+  ): Promise<Result<boolean, "FAILED_TO_CHECK_FRIEND">> {
+    try {
+      const sql = Friendship.createQueryBuilder("FR")
+        .where(
+          new Brackets((qb) =>
+            qb
+              .where("FR.userFromId=:userFromId", { userFromId: this.id })
+              .andWhere("FR.userToId=:userToId", { userToId: friend.id })
+              .andWhere(`FR.accepted=TRUE`)
+          )
+        )
+        .orWhere(
+          new Brackets((qb) =>
+            qb
+              .where("FR.userFromId=:userFromId", { userFromId: friend.id })
+              .andWhere("FR.userToId=:userToId", { userToId: this.id })
+              .andWhere(`FR.accepted=TRUE`)
+          )
+        );
+
+      return Ok(Boolean(await sql.getOne()));
+    } catch (err) {
+      console.error(err);
+      return Err("FAILED_TO_CHECK_FRIEND");
+    }
   }
 
   public async getFriends(): Promise<Result<User[], "FAILED_TO_GET_FRIENDS">> {

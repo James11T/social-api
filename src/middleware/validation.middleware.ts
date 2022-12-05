@@ -11,7 +11,7 @@ const validateRequest = (req: Request, res: Response, next: NextFunction) => {
     errors.array().forEach((error) => {
       badParams[error.param] = {
         location: error.location ?? "unknown",
-        message: error.msg,
+        message: error.msg
       };
     });
 

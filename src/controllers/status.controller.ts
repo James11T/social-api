@@ -17,7 +17,7 @@ const pingController = async (
     status: "ONLINE",
     version: process.env.npm_package_version ?? "UNKNOWN",
     country: req.country,
-    memoryUsage: RUNTIME_CONSTANTS.IS_DEV ? getMemoryUsage() : undefined,
+    memoryUsage: RUNTIME_CONSTANTS.IS_DEV ? getMemoryUsage() : undefined
   });
 };
 

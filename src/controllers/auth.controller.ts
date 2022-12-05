@@ -2,7 +2,7 @@ import {
   APIServerError,
   APINotFoundError,
   APIBadRequestError,
-  APIUnauthorizedError,
+  APIUnauthorizedError
 } from "../errors/api";
 import { getEpoch } from "../utils/time";
 import { RefreshToken, User } from "../models";
@@ -74,8 +74,8 @@ const authenticateController = async (
     user: {
       id: user.id,
       email: user.email,
-      username: user.username,
-    },
+      username: user.username
+    }
   });
 
   // TODO: Test
@@ -115,7 +115,7 @@ const refreshAccessController = async (
     return next(new APIServerError("Failed to generate access token"));
 
   return res.json({
-    accessToken: accessJWT.val,
+    accessToken: accessJWT.val
   });
 }; // POST
 
@@ -146,7 +146,7 @@ const forgotPasswordController = async (
 
   res.json({
     success: true,
-    token: RUNTIME_CONSTANTS.IS_DEV ? token : undefined,
+    token: RUNTIME_CONSTANTS.IS_DEV ? token : undefined
   });
 
   // TODO: Test
@@ -173,5 +173,5 @@ export {
   authenticateController,
   forgotPasswordController,
   whoAmIController,
-  refreshAccessController,
+  refreshAccessController
 };

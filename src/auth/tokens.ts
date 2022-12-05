@@ -23,7 +23,7 @@ const generateAccessToken = async (
 
   try {
     DBRefreshToken = await RefreshToken.findOne({
-      where: { id: refreshToken.jti },
+      where: { id: refreshToken.jti }
     });
   } catch {
     return Err("FAILED_TO_GET_REFRESH_TOKEN");
@@ -41,7 +41,7 @@ const generateAccessToken = async (
     refresh_jti: DBRefreshToken.id,
     sub: user.id,
     exp: now + ACCESS_TOKEN_CONSTANTS.TOKEN_TTL,
-    iat: now,
+    iat: now
   };
 
   return Ok(data);
@@ -59,7 +59,7 @@ const generateRefreshToken = async (
     sub: user.id,
     iat: now,
     exp: now + REFRESH_TOKEN_CONSTANTS.TOKEN_TTL,
-    scp: scope,
+    scp: scope
   };
 
   return [data, tokenId];

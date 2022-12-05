@@ -15,7 +15,7 @@ class APIBaseError extends Error {
       stack:
         RUNTIME_CONSTANTS.IS_DEV && this.stack
           ? this.stack.split("\n").map((line) => line.trim())
-          : undefined,
+          : undefined
     };
   }
 }
@@ -83,5 +83,5 @@ export {
   APINotFoundError,
   APIConflictError,
   APIServerError,
-  APIParameterError,
+  APIParameterError
 };

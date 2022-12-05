@@ -6,7 +6,7 @@ import {
   Post,
   PostMedia,
   UserTOTP,
-  RefreshToken,
+  RefreshToken
 } from "../models";
 import type { Result } from "ts-results";
 
@@ -14,7 +14,7 @@ const {
   DB_USER,
   DB_PASSWORD,
   DB_DATABASE,
-  DB_HOST = "localhost",
+  DB_HOST = "localhost"
 } = process.env;
 
 export const AppDataSource = new DataSource({
@@ -27,7 +27,7 @@ export const AppDataSource = new DataSource({
   logging: false,
   entities: [User, Friendship, Post, PostMedia, UserTOTP, RefreshToken],
   subscribers: [],
-  migrations: [],
+  migrations: []
 });
 
 const initializeDatabase = async (): Promise<

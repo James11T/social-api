@@ -14,9 +14,9 @@ const testUsers: UserType[] = [
     friends: [
       {
         userId: "testuser2",
-        status: "friend",
-      },
-    ],
+        status: "friend"
+      }
+    ]
   },
   {
     userId: "testuser2",
@@ -25,9 +25,9 @@ const testUsers: UserType[] = [
     friends: [
       {
         userId: "testuser1",
-        status: "friend",
-      },
-    ],
+        status: "friend"
+      }
+    ]
   },
   {
     userId: "testuser3",
@@ -36,9 +36,9 @@ const testUsers: UserType[] = [
     friends: [
       {
         userId: "testuser4",
-        status: "pendingInbound",
-      },
-    ],
+        status: "pendingInbound"
+      }
+    ]
   },
   {
     userId: "testuser4",
@@ -47,10 +47,10 @@ const testUsers: UserType[] = [
     friends: [
       {
         userId: "testuser3",
-        status: "pendingOutbound",
-      },
-    ],
-  },
+        status: "pendingOutbound"
+      }
+    ]
+  }
 ];
 
 let mongoServer: MongoMemoryServer;

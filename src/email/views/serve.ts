@@ -45,7 +45,7 @@ app.get("/:template", (req, res) => {
   return res.send(
     templates[template]({
       name: "Username",
-      request: { ip: "127.0.0.1", flag: "🌍" },
+      request: { ip: "127.0.0.1", flag: "🌍" }
     })
   );
 });

@@ -6,7 +6,7 @@ import {
   PrimaryColumn,
   BaseEntity,
   ManyToOne,
-  OneToMany,
+  OneToMany
 } from "typeorm";
 import type { Relation } from "typeorm";
 

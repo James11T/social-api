@@ -8,7 +8,7 @@ import {
   Column,
   PrimaryColumn,
   ManyToOne,
-  BeforeInsert,
+  BeforeInsert
 } from "typeorm";
 import type { Relation } from "typeorm";
 import type { Result } from "ts-results";
@@ -55,7 +55,7 @@ export class UserTOTP extends BaseModel {
     try {
       const userTotp = await UserTOTP.findOneBy({
         id,
-        user: user ? { id: user.id } : undefined,
+        user: user ? { id: user.id } : undefined
       });
       return Ok(userTotp);
     } catch (err) {

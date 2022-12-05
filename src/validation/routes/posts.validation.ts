@@ -14,7 +14,7 @@ const validateCreatePost = [
   body("caption")
     .isLength({ min: 1, max: 2048 })
     .withMessage("Post caption must be between 1 and 2048 characters"),
-  validateRequest,
+  validateRequest
 ];
 
 const validateMedia = (req: Request, res: Response, next: NextFunction) => {

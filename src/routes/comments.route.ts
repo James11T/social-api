@@ -4,7 +4,7 @@ import {
   getCommentController,
   createCommentController,
   deleteCommentController,
-  editCommentController,
+  editCommentController
 } from "../controllers/comments.controller";
 
 const commentsRouter = Router();

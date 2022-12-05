@@ -9,8 +9,10 @@ const authenticate = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const accessToken = req.headers.authorization;
+  let accessToken = req.headers.authorization;
   if (!accessToken) return next();
+
+  if (accessToken.startsWith("Bearer ")) accessToken = accessToken.slice(7); // If the auth starts with Bearer, remove it
 
   const decoded = decodeSignedToken<JWTAccessToken>(accessToken);
   if (decoded.err) return next(new APIUnauthorizedError("Bad access token"));

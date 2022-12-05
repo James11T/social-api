@@ -120,7 +120,7 @@ const sendTemplate = async (
   await sendEmail(to, {
     ...options,
     html,
-    text,
+    text
   });
 
   // TODO: Test

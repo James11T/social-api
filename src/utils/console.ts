@@ -17,7 +17,7 @@ const format = {
   waiting: hourglass,
   dev: hammer,
   build: hammer,
-  link,
+  link
 };
 
 export default format;

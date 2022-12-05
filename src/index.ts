@@ -21,7 +21,7 @@ const requiredEnvVars = [
   "AWS_REGION",
   "AWS_ACCESS_KEY_ID",
   "AWS_SECRET_ACCESS_KEY",
-  "AWS_S3_IMAGE_BUCKET",
+  "AWS_S3_IMAGE_BUCKET"
 ];
 
 const anyMissing = requiredEnvVars.some((envVar) => {
