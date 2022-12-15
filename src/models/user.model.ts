@@ -33,7 +33,7 @@ export class User extends BaseModel {
   @Column({ length: 2000, default: "" })
   about!: string;
 
-  @Column({ length: 255 })
+  @Column({ length: 255, unique: true })
   email!: string;
 
   @Column({ name: "email_verified", default: false })

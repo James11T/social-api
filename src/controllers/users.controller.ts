@@ -101,6 +101,13 @@ const createUserController = async (
   if (getUsername.val)
     return next(new APIConflictError("User ID is taken or reserved"));
 
+  const getEmail = await User.fromEmail(email);
+  if (getEmail.err)
+    return next(new APIServerError("Failed to check email status"));
+
+  if (getEmail.val)
+    return next(new APIConflictError("Email is already in use"));
+
   const passwordHash = await hashPassword(password);
   if (passwordHash.err) {
     return next(new APIServerError("Failed to hash password"));
