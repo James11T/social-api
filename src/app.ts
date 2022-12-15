@@ -9,8 +9,6 @@ import { logRequest } from "./middleware/pre.middleware";
 
 const app = express();
 
-app.use;
-
 app.use(setRequestMeta);
 app.use(express.urlencoded({ extended: true })); // Parse forms
 app.use(express.json()); // Parse JSON bodies

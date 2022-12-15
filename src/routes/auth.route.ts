@@ -12,7 +12,7 @@ import {
 
 const authRouter = Router();
 
-authRouter.post("/authenticate", validateSignIn, authenticateController); // TODO: Validation
+authRouter.post("/authenticate", authenticateController); // TODO: Validation
 authRouter.post("/refresh", refreshAccessController); // TODO: Validation
 authRouter.get(
   "/:id/forgot-password/",

@@ -136,7 +136,7 @@ const createUserController = async (
     return next(new APIServerError("Failed to send confirmation email"));
   }
 
-  return res.json({ success: true });
+  return res.json({ success: true, id: newUser.id });
 
   // TODO: Test
 }; // POST
