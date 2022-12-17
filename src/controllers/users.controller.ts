@@ -99,7 +99,7 @@ const createUserController = async (
     return next(new APIServerError("Failed to check username availability"));
 
   if (getUsername.val)
-    return next(new APIConflictError("User ID is taken or reserved"));
+    return next(new APIConflictError("Username is taken or reserved"));
 
   const getEmail = await User.fromEmail(email);
   if (getEmail.err)
