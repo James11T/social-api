@@ -8,7 +8,7 @@ import { hashPassword } from "../auth/password";
 import { sendTemplate } from "../email/templates";
 import { TOTP_CONSTANTS, WEB_CONSTANTS } from "../config";
 import { getVerificationToken } from "../email/verification";
-import * as userRequestSchemas from "../validation/users.validation";
+import type * as userRequestSchemas from "../validation/users.validation";
 import type { Result } from "ts-results";
 import type { Response, NextFunction } from "express";
 import type { ValidatedRequest } from "../middleware/validation.middleware";

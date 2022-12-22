@@ -1,11 +1,11 @@
 import * as APIErrors from "../errors/api";
-import * as AuthRequestSchemas from "../validation/auth.validation";
 import { getEpoch } from "../utils/time";
 import { RefreshToken, User } from "../models";
 import { decodeSignedToken, signToken } from "../utils/jwt";
 import { invokePasswordReset, verifyPassword } from "../auth/password";
 import { RUNTIME_CONSTANTS, REFRESH_TOKEN_CONSTANTS } from "../config";
 import { generateAccessToken, generateRefreshToken } from "../auth/tokens";
+import type * as AuthRequestSchemas from "../validation/auth.validation";
 import type { JWTRefreshToken } from "../types";
 import type { NextFunction, Request, Response } from "express";
 import type { ValidatedRequest } from "../middleware/validation.middleware";

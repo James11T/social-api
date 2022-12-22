@@ -5,17 +5,9 @@ import { uuid } from "../utils/strings";
 import { UserTOTP } from "./userTOTP.model";
 import { Friendship } from "./friendship.model";
 import { RefreshToken } from "./refreshToken.model";
-import {
-  Entity,
-  Column,
-  PrimaryColumn,
-  OneToMany,
-  BeforeInsert,
-  FindOptionsWhere,
-  Brackets,
-} from "typeorm";
+import { Entity, Column, PrimaryColumn, OneToMany, BeforeInsert, Brackets } from "typeorm";
 import type { Result } from "ts-results";
-import type { Relation, FindOneOptions } from "typeorm";
+import type { Relation, FindOneOptions, FindOptionsWhere } from "typeorm";
 
 type FETCH_USER_ERRORS = "FAILED_TO_FETCH_USER";
 

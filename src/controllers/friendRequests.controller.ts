@@ -1,9 +1,9 @@
 import * as APIErrors from "../errors/api";
-import * as friendRequestSchemas from "../validation/friendRequests.validation";
 import { Friendship, User } from "../models";
 import { FriendshipState } from "../models/friendship.model";
-import { ValidatedRequest } from "../middleware/validation.middleware";
+import type * as friendRequestSchemas from "../validation/friendRequests.validation";
 import type { Response, NextFunction } from "express";
+import type { ValidatedRequest } from "../middleware/validation.middleware";
 
 /**
  * Get all friend requests for a user

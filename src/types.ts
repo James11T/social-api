@@ -13,4 +13,4 @@ interface JWTRefreshToken {
   scp: string; // Scope
 }
 
-export { JWTAccessToken, JWTRefreshToken };
+export type { JWTAccessToken, JWTRefreshToken };
