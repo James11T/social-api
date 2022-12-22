@@ -43,7 +43,6 @@ const verifyPassword = async (
   hash: string
 ): Promise<boolean> => {
   const isValid = await argon2.verify(hash, password, hashingOptions);
-
   return isValid;
 };
 
@@ -60,7 +59,6 @@ const invokePasswordReset = async (user: User) => {
   );
 
   return resetJWT;
-  // TODO: Test
 };
 
 export { verifyPassword, hashPassword, invokePasswordReset };

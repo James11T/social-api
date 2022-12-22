@@ -4,8 +4,7 @@ import express from "express";
 import baseRouter from "./routes";
 import cookieParser from "cookie-parser";
 import errorHandler from "./middleware/error.middleware";
-import setRequestMeta from "./middleware/pre.middleware";
-import { logRequest } from "./middleware/pre.middleware";
+import setRequestMeta, { logRequest } from "./middleware/pre.middleware";
 
 const app = express();
 

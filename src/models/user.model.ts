@@ -24,8 +24,11 @@ export class User extends BaseModel {
   @PrimaryColumn({ length: 36, default: "" })
   id!: string;
 
-  @Column({ length: 64, nullable: false, unique: true })
+  @Column({ length: 32, nullable: false, unique: true })
   username!: string;
+
+  @Column({ length: 32, nullable: false })
+  displayName!: string;
 
   @Column({ length: 255, nullable: true, type: "varchar" })
   avatar: string | null = null;

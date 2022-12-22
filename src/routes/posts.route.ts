@@ -8,11 +8,9 @@ import {
 } from "../controllers/posts.controller";
 import fileUpload from "express-fileupload";
 import { POST_CONSTANTS } from "../config";
-import {
-  validateMedia,
-  validateCreatePost
-} from "../validation/routes/posts.validation";
 import { protect } from "../middleware/auth.middleware";
+import { validate } from "../middleware/validation.middleware";
+import { createPostSchema } from "../validation/posts.validation";
 
 const postsRouter = Router();
 
@@ -26,8 +24,7 @@ postsRouter.post(
       fileSize: POST_CONSTANTS.MAX_MEDIA_SIZE
     }
   }),
-  validateCreatePost,
-  validateMedia,
+  validate(createPostSchema),
   createPostController
 );
 

@@ -15,6 +15,7 @@ class BaseModel extends BaseEntity {
       const res = await this.save(options);
       return Ok(res);
     } catch (err) {
+      console.error(err);
       return Err("FAILED_TO_SAVE");
     }
   }

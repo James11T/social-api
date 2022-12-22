@@ -1,26 +1,34 @@
 import { Router } from "express";
 import {
   authenticateController,
-  forgotPasswordController,
+  resetPasswordController,
   whoAmIController,
   refreshAccessController
 } from "../controllers/auth.controller";
+import { validate } from "../middleware/validation.middleware";
 import {
-  validateSignIn,
-  validateForgotPassword
-} from "../validation/routes/auth.validation";
+  authenticateSchema,
+  refreshAccessSchema,
+  resetPasswordSchema
+} from "../validation/auth.validation";
 
 const authRouter = Router();
 
-authRouter.post("/authenticate", authenticateController); // TODO: Validation
-authRouter.post("/refresh", refreshAccessController); // TODO: Validation
+authRouter.post(
+  "/authenticate",
+  validate(authenticateSchema),
+  authenticateController
+);
+authRouter.post(
+  "/refresh",
+  validate(refreshAccessSchema),
+  refreshAccessController
+);
 authRouter.get(
-  "/:id/forgot-password/",
-  validateForgotPassword, // TODO: Change to central validation
-  forgotPasswordController
+  "/:userId/reset-password/",
+  validate(resetPasswordSchema),
+  resetPasswordController
 );
 authRouter.get("/whoami", whoAmIController);
-
-// TODO: Update diagram
 
 export default authRouter;

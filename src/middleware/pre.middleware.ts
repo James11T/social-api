@@ -4,7 +4,7 @@ import { colorizeHTTPCode } from "../utils/strings";
 import type { Request, Response, NextFunction } from "express";
 
 const setRealIp = (req: Request, res: Response, next: NextFunction) => {
-  let ip =
+  const ip =
     req.header("x-real-ip") ??
     req.header("cf-connecting-ip") ??
     req.header("x-forwarded-for");

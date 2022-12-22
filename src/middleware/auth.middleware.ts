@@ -32,9 +32,13 @@ const protect = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
+  if (!req.user)
+    return next(
+      new APIUnauthorizedError(
+        "You must be authenticated to access this endpoint"
+      )
+    );
   next();
-  // TODO: DO
-  // TODO: Test
 };
 
 export { authenticate, protect };

@@ -59,8 +59,6 @@ const sendEmail = async (
     html: combinedOptions.html,
     attachments: combinedOptions.attachments
   });
-
-  // TODO: Test
 };
 
 export { sendEmail };

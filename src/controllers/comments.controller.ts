@@ -2,53 +2,28 @@ import type { Request, Response } from "express";
 
 /**
  * Filter comments by search query
- *
- * @param req Express request object
- * @param res Express response object
  */
-const queryCommentController = async (req: Request, res: Response) => {
-  // TODO: Implement
-}; // GET
+const queryCommentController = async (req: Request, res: Response) => {};
 
 /**
  * Create a comment from the request body
- *
- * @param req Express request object
- * @param res Express response object
  */
-const createCommentController = async (req: Request, res: Response) => {
-  // TODO: Implement
-}; // POST
+const createCommentController = async (req: Request, res: Response) => {};
 
 /**
  * Get a comment by ID
- *
- * @param req Express request object
- * @param res Express response object
  */
-const getCommentController = async (req: Request, res: Response) => {
-  // TODO: Implement
-}; // GET
+const getCommentController = async (req: Request, res: Response) => {};
 
 /**
  * Delete a comment by ID
- *
- * @param req Express request object
- * @param res Express response object
  */
-const deleteCommentController = async (req: Request, res: Response) => {
-  // TODO: Implement
-}; // DELETE
+const deleteCommentController = async (req: Request, res: Response) => {};
 
 /**
  * Update a comment by ID
- *
- * @param req Express request object
- * @param res Express response object
  */
-const editCommentController = async (req: Request, res: Response) => {
-  // TODO: Implement
-}; // PATCH
+const editCommentController = async (req: Request, res: Response) => {};
 
 export {
   queryCommentController,

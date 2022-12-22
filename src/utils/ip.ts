@@ -1,6 +1,6 @@
 import geoip from "geoip-country";
 import { Ok, Err } from "ts-results";
-import countryCodeEmoji from "country-code-emoji";
+import { countryCodeEmoji } from "country-code-emoji";
 import type { Result } from "ts-results";
 
 const FAIL_COUNTRY_CODE = "ZZ";

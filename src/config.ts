@@ -15,18 +15,14 @@ export const HASHING_CONSTANTS = {
 
 export const PASSWORD_CONSTANTS = {
   minPasswordLength: 8,
-  maxPasswordLength: 256,
-  minSpecialCharacters: 0,
-  minNumbers: 0,
-  mustVaryCase: false,
-  nonSpecialCharacters: /[a-zA-Z0-9 ]/g
+  maxPasswordLength: 256
 };
 
 export const USERNAME_CONSTANTS = {
   minUsernameLength: 3,
   maxUsernameLength: 32,
   allowedChars: /[a-zA-Z0-9-_.]/g,
-  matchRegex: /^(?=.{3,32}$)(?![_.-])(?!.*[_.-]{2})[a-zA-Z0-9._-]+([^._\s-])$/
+  matchRegex: /^(?![_.-])(?!.*[_.-]{2})[a-zA-Z0-9._-]+([^._\s-])$/
 };
 
 export const RUNTIME_CONSTANTS = {
@@ -47,8 +43,7 @@ export const PASSWORD_RESET_CONSTANTS = {
 
 export const POST_CONSTANTS = {
   MAX_MEDIA_COUNT: 8,
-  MAX_MEDIA_SIZE: bytes.parse("50MB"),
-  ALLOWED_MEDIA_TYPES: ["image/jpeg", "image/png", "image/webp", "image/tiff"]
+  MAX_MEDIA_SIZE: bytes.parse("50MB")
 };
 
 export const REFRESH_TOKEN_CONSTANTS = {

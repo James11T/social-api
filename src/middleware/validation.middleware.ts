@@ -1,29 +1,37 @@
 import { APIParameterError } from "../errors/api";
-import { validationResult } from "express-validator";
-import type { BadParams } from "../errors/api";
+import type { z, ZodObject } from "zod";
 import type { Request, Response, NextFunction } from "express";
 
-const validateRequest = (req: Request, res: Response, next: NextFunction) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    const badParams: BadParams = {};
+type ValidationSchema = ZodObject<{
+  params?: any;
+  body?: any;
+  query?: any;
+}>;
 
-    errors.array().forEach((error) => {
-      badParams[error.param] = {
-        location: error.location ?? "unknown",
-        message: error.msg
-      };
-    });
+const validate =
+  (schema: ValidationSchema) =>
+  async (req: Request, res: Response, next: NextFunction) => {
+    const parseResult = await schema.safeParseAsync(req);
 
-    return next(
-      new APIParameterError(
-        "One or more supplied parameters are invalid",
-        badParams
-      )
-    );
-  }
+    if (!parseResult.success) {
+      console.log(parseResult.error);
+      return next(new APIParameterError("", {}));
+    }
 
-  next();
-};
+    next();
+  };
 
-export default validateRequest;
+type ValidatedRequest<
+  Schema extends ValidationSchema,
+  resBody = any,
+  Locals extends Record<string, any> = Record<string, any>
+> = Request<
+  z.infer<Schema>["params"],
+  resBody,
+  z.infer<Schema>["body"],
+  z.infer<Schema>["query"],
+  Locals
+>;
+
+export { validate };
+export type { ValidatedRequest };

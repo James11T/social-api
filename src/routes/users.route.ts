@@ -3,37 +3,73 @@ import {
   filterUserController,
   getUserController,
   createUserController,
-  getFriendRequestsController,
-  sendFriendRequestsController,
   getUserFriendsController,
-  isUsernameTakenController,
+  isUsernameAvailableController,
   create2FA,
-  disable2FA,
+  deactivate2FA,
   activate2FA,
   getTOTP_IDs
 } from "../controllers/users.controller";
 import { protect } from "../middleware/auth.middleware";
-import { validateUserQuery } from "../validation/routes/users.validation";
-import { validateTotp } from "../validation/routes/auth.validation";
+import {
+  validate,
+  ValidatedRequest
+} from "../middleware/validation.middleware";
+import {
+  activate2FASchema,
+  create2FASchema,
+  createUserSchema,
+  deactivate2FASchema,
+  filterUserSchema,
+  getTOTP_IDsSchema,
+  getUserFriendsSchema,
+  getUserSchema,
+  isUsernameAvailableSchema
+} from "../validation/users.validation";
 
 const usersRouter = Router(); // /users
 
-usersRouter.post("/", createUserController);
+usersRouter.post("/", validate(createUserSchema), createUserController);
+usersRouter.get("/", validate(filterUserSchema), filterUserController);
+usersRouter.get("/:username", validate(getUserSchema), getUserController);
 
-usersRouter.get("/", validateUserQuery, filterUserController);
-usersRouter.get("/:id", getUserController);
+usersRouter.get(
+  "/:username/is-available",
+  validate(isUsernameAvailableSchema),
+  isUsernameAvailableController
+);
 
-usersRouter.get("/:username/is-available", isUsernameTakenController);
-
-usersRouter.get("/:id/friends", getUserFriendsController);
-usersRouter.get("/:id/friend-requests", protect, getFriendRequestsController);
-usersRouter.post("/:id/friend-requests", protect, sendFriendRequestsController);
+usersRouter.get(
+  "/:username/friends",
+  validate(getUserFriendsSchema),
+  getUserFriendsController
+);
 
 // usersRouter.post("/:id/change-password", validateChangePassword, changePasswordController);
 
-usersRouter.post("/:id/2fa/create", protect, create2FA);
-usersRouter.post("/:id/2fa/activate", protect, validateTotp, activate2FA);
-usersRouter.post("/:id/2fa/disable", protect, validateTotp, disable2FA);
-usersRouter.post("/:id/2fa/status", protect, getTOTP_IDs);
+usersRouter.post(
+  "/:username/2fa/create",
+  protect,
+  validate(create2FASchema),
+  create2FA
+);
+usersRouter.post(
+  "/:username/2fa/activate",
+  protect,
+  validate(activate2FASchema),
+  activate2FA
+);
+usersRouter.post(
+  "/:username/2fa/deactivate",
+  protect,
+  validate(deactivate2FASchema),
+  deactivate2FA
+);
+usersRouter.post(
+  "/:username/2fa/status",
+  protect,
+  validate(getTOTP_IDsSchema),
+  getTOTP_IDs
+);
 
 export default usersRouter;

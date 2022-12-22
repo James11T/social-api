@@ -1,44 +1,37 @@
+import * as APIErrors from "../errors/api";
 import { uuid } from "../utils/strings";
+import AppDataSource from "../database";
 import { WEB_CONSTANTS } from "../config";
 import { uploadFile } from "../services/s3";
 import { alwaysArray } from "../utils/array";
-import {
-  APIBadRequestError,
-  APIServerError,
-  APIUnauthorizedError
-} from "../errors/api";
-import type { NextFunction, Request, Response } from "express";
 import { Post, PostMedia } from "../models";
-import AppDataSource from "../database";
+import * as postRequestSchemas from "../validation/posts.validation";
+import { ValidatedRequest } from "../middleware/validation.middleware";
+import type { NextFunction, Request, Response } from "express";
 
 const { WEB_DOMAIN, AWS_S3_IMAGE_BUCKET } = process.env;
 
 /**
  * Filter posts by search query
- *
- * @param req Express request object
- * @param res Express response object
  */
-const queryPostsController = async (req: Request, res: Response) => {
-  // TODO: Implement
-}; // GET
+const queryPostsController = async (req: Request, res: Response) => {};
 
 /**
  * Create a post from the request body
- *
- * @param req Express request object
- * @param res Express response object
  */
 const createPostController = async (
-  req: Request,
+  req: ValidatedRequest<typeof postRequestSchemas.createPostSchema>,
   res: Response,
   next: NextFunction
 ) => {
   if (!req.user)
     return next(
-      new APIUnauthorizedError("You must be authenticated to create posts")
+      new APIErrors.APIUnauthorizedError(
+        "You must be authenticated to create posts"
+      )
     );
-  if (!req.files) return next(new APIBadRequestError("No files submitted"));
+  if (!req.files)
+    return next(new APIErrors.APIBadRequestError("No files submitted"));
 
   const files = alwaysArray(req.files.media);
   const postId = uuid();
@@ -58,7 +51,7 @@ const createPostController = async (
       AWS_S3_IMAGE_BUCKET
     );
     if (uploadRes.err) {
-      return next(new APIServerError("Error uploading files"));
+      return next(new APIErrors.APIServerError("Error uploading files"));
     }
 
     uploads.push(
@@ -83,25 +76,19 @@ const createPostController = async (
     });
   } catch (err) {
     console.error(err);
-    return next(new APIServerError("Failed to save post"));
+    return next(new APIErrors.APIServerError("Failed to save post"));
   }
 
   return res.json({
     media: uploads,
     postId
   });
-  // TODO: Current
-}; // POST
+};
 
 /**
  * Get a post by ID
- *
- * @param req Express request object
- * @param res Express response object
  */
-const getPostController = async (req: Request, res: Response) => {
-  // TODO: Implement
-}; // GET
+const getPostController = async (req: Request, res: Response) => {};
 
 /**
  * Delete a post by ID
@@ -109,9 +96,7 @@ const getPostController = async (req: Request, res: Response) => {
  * @param req Express request object
  * @param res Express response object
  */
-const deletePostController = async (req: Request, res: Response) => {
-  // TODO: Implement
-}; // DELETE
+const deletePostController = async (req: Request, res: Response) => {};
 
 /**
  * Edit a post by ID based off the request body
@@ -119,9 +104,7 @@ const deletePostController = async (req: Request, res: Response) => {
  * @param req Express request object
  * @param res Express response object
  */
-const editPostController = async (req: Request, res: Response) => {
-  // TODO: Implement
-}; // PATCH
+const editPostController = async (req: Request, res: Response) => {};
 
 export {
   queryPostsController,

@@ -2,39 +2,25 @@ import qr from "qrcode";
 import { Like } from "typeorm";
 import { Ok, Err } from "ts-results";
 import { authenticator } from "otplib";
-import { TOTP_CONSTANTS, WEB_CONSTANTS } from "../config";
-import { sendTemplate } from "../email/templates";
-import { Friendship, User, UserTOTP } from "../models";
-import { FriendshipState } from "../models/friendship.model";
-import {
-  APIBadRequestError,
-  APIServerError,
-  APINotFoundError,
-  APIUnauthorizedError,
-  APIConflictError
-} from "../errors/api";
-import type { Result } from "ts-results";
-import type { Request, Response, NextFunction } from "express";
+import { User, UserTOTP } from "../models";
+import * as APIErrors from "../errors/api";
 import { hashPassword } from "../auth/password";
+import { sendTemplate } from "../email/templates";
+import { TOTP_CONSTANTS, WEB_CONSTANTS } from "../config";
 import { getVerificationToken } from "../email/verification";
-
-interface FilterQuery {
-  username: string;
-  limit?: number;
-}
+import * as userRequestSchemas from "../validation/users.validation";
+import type { Result } from "ts-results";
+import type { Response, NextFunction } from "express";
+import type { ValidatedRequest } from "../middleware/validation.middleware";
 
 /**
  * Find a user based on attributes like name, email, etc.
- *
- * @param req Express request object
- * @param res Express response object
  */
 const filterUserController = async (
-  req: Request<unknown, unknown, unknown, FilterQuery>,
+  req: ValidatedRequest<typeof userRequestSchemas.filterUserSchema>,
   res: Response,
   next: NextFunction
 ) => {
-  // TODO: Add pagination
   const { username, limit = 20 } = req.query;
 
   try {
@@ -42,81 +28,77 @@ const filterUserController = async (
       where: {
         username: Like(`%${username}%`)
       },
-      take: limit
+      take: Number(limit)
     });
     return res.json(users);
   } catch (err) {
     console.error(err);
-    return next(new APIServerError("Failed to fetch users"));
+    return next(new APIErrors.APIServerError("Failed to fetch users"));
   }
-}; // GET
+};
 
 /**
- * Get a user from their ID
- *
- * @param req Express request object
- * @param res Express response object
+ * Get a user from their username
  */
 const getUserController = async (
-  req: Request,
+  req: ValidatedRequest<typeof userRequestSchemas.getUserSchema>,
   res: Response,
   next: NextFunction
 ) => {
-  const { id } = req.params;
+  const { username } = req.params;
 
-  const user = await User.fromId(id);
-  if (user.err) return next(new APIServerError("Failed to get user"));
-  if (!user.val) return next(new APINotFoundError("User not found"));
+  const user = await User.fromUsername(username);
+  if (user.err) return next(new APIErrors.APIServerError("Failed to get user"));
+  if (!user.val) return next(new APIErrors.APINotFoundError("User not found"));
 
   await user.val.isFriendsWith(user.val);
 
   return res.json(user.val);
-}; // GET
-
-interface SignUpBody {
-  username: string;
-  email: string;
-  password: string;
-}
+};
 
 /**
  * Create a new user from the request body
- *
- * Methods: POST
  */
 const createUserController = async (
-  req: Request<unknown, unknown, SignUpBody>,
+  req: ValidatedRequest<typeof userRequestSchemas.createUserSchema>,
   res: Response,
   next: NextFunction
 ) => {
   if (req.user)
-    return next(new APIBadRequestError("Cannot sign up while authenticated"));
+    return next(
+      new APIErrors.APIBadRequestError("Cannot sign up while authenticated")
+    );
 
   const { username, email, password } = req.body;
 
   const getUsername = await User.fromUsername(username);
   if (getUsername.err)
-    return next(new APIServerError("Failed to check username availability"));
+    return next(
+      new APIErrors.APIServerError("Failed to check username availability")
+    );
 
   if (getUsername.val)
-    return next(new APIConflictError("Username is taken or reserved"));
+    return next(
+      new APIErrors.APIConflictError("Username is taken or reserved")
+    );
 
   const getEmail = await User.fromEmail(email);
   if (getEmail.err)
-    return next(new APIServerError("Failed to check email status"));
+    return next(new APIErrors.APIServerError("Failed to check email status"));
 
   if (getEmail.val)
-    return next(new APIConflictError("Email is already in use"));
+    return next(new APIErrors.APIConflictError("Email is already in use"));
 
   const passwordHash = await hashPassword(password);
   if (passwordHash.err) {
-    return next(new APIServerError("Failed to hash password"));
+    return next(new APIErrors.APIServerError("Failed to hash password"));
   }
 
   const verificationToken = getVerificationToken();
 
   const newUser = new User();
   newUser.username = username;
+  newUser.displayName = username;
   newUser.email = email;
   newUser.registeredAt = new Date();
   newUser.passwordHash = passwordHash.val;
@@ -124,7 +106,7 @@ const createUserController = async (
   const saveResult = await newUser.pcallSave();
 
   if (saveResult.err) {
-    return next(new APIServerError("Failed to create user"));
+    return next(new APIErrors.APIServerError("Failed to create user"));
   }
 
   try {
@@ -140,157 +122,66 @@ const createUserController = async (
   } catch (err) {
     console.error(err);
 
-    return next(new APIServerError("Failed to send confirmation email"));
+    return next(
+      new APIErrors.APIServerError("Failed to send confirmation email")
+    );
   }
 
   return res.json({ success: true, id: newUser.id });
-
-  // TODO: Test
-}; // POST
-
-/**
- * Get all friend requests for a user
- *
- * @param req Express request object
- * @param res Express response object
- */
-const getFriendRequestsController = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const { id } = req.params;
-
-  const user = await User.fromId(id);
-
-  if (user.err) return next(new APIServerError("Failed to get user"));
-  if (!user.val) return next(new APINotFoundError("User not found"));
-
-  const friendRequests = await user.val.getIncomingFriendRequests();
-
-  if (friendRequests.err)
-    return next(new APIServerError("Failed to get friend requests"));
-
-  return res.json(friendRequests.val);
-}; // GET
-
-/**
- * Send a friend request to the specified user as the currently authenticated user
- *
- * @param req Express request object
- * @param res Express response object
- */
-const sendFriendRequestsController = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const { id: fromId } = req.params;
-  const { to: toId } = req.body;
-
-  const fromUser = await User.fromId(fromId);
-  const toUser = await User.fromId(toId);
-
-  if (fromUser.err || toUser.err)
-    return next(new APIServerError("Failed to get users"));
-  if (!fromUser.val)
-    return next(new APINotFoundError("Friend request sender not found"));
-  if (!toUser.val)
-    return next(new APINotFoundError("Friend request recipient not found"));
-
-  // Double check in case of formatting
-  if (fromUser.val.id === toUser.val.id)
-    return next(
-      new APIBadRequestError("Cannot send a friend request to yourself")
-    );
-
-  const friendshipState = await Friendship.getFriendshipState(
-    fromUser.val,
-    toUser.val
-  );
-
-  if (friendshipState.err)
-    return next(new APIServerError("Failed to check friendship status"));
-
-  if (friendshipState.val === FriendshipState.PENDING) {
-    return next(
-      new APIBadRequestError(
-        "You already have a pending friend request with this user"
-      )
-    );
-  } else if (friendshipState.val === FriendshipState.FRIENDS) {
-    return next(
-      new APIBadRequestError("You are already friends with this user")
-    );
-  }
-
-  try {
-    const newFriendship = new Friendship();
-    newFriendship.userFromId = fromUser.val.id;
-    newFriendship.userToId = toUser.val.id;
-    newFriendship.sentAt = new Date();
-    await newFriendship.save();
-
-    return res.json({ success: true });
-  } catch (err) {
-    return next(new APIServerError("Failed to create friend request"));
-  }
-
-  // TODO: Test
-}; // POST
+};
 
 /**
  * Get all friends for a user
- *
- * @param req Express request object
- * @param res Express response object
  */
 const getUserFriendsController = async (
-  req: Request,
+  req: ValidatedRequest<typeof userRequestSchemas.getUserFriendsSchema>,
   res: Response,
   next: NextFunction
 ) => {
-  const { id } = req.params;
+  const { username } = req.params;
 
-  const user = await User.fromId(id);
+  const user = await User.fromId(username);
 
-  if (user.err) return next(new APIServerError("Failed to get user"));
-  if (!user.val) return next(new APINotFoundError("User not found"));
+  if (user.err) return next(new APIErrors.APIServerError("Failed to get user"));
+  if (!user.val) return next(new APIErrors.APINotFoundError("User not found"));
 
   const friends = await user.val.getFriends();
 
   if (friends.err)
-    return next(new APIServerError("Failed to get friend requests"));
+    return next(new APIErrors.APIServerError("Failed to get friend requests"));
 
   return res.json(friends.val);
-  // TODO: Test
-}; // GET
+};
 
-const isUsernameTakenController = async (
-  req: Request,
+const isUsernameAvailableController = async (
+  req: ValidatedRequest<typeof userRequestSchemas.isUsernameAvailableSchema>,
   res: Response,
   next: NextFunction
 ) => {
   const { username } = req.params;
 
   const user = await User.fromUsername(username);
-  if (user.err) return next(new APIServerError("Failed to check username"));
+  if (user.err)
+    return next(new APIErrors.APIServerError("Failed to check username"));
 
   return res.json({ available: !user.val });
-
-  // TODO: Test
-}; // GET
+};
 
 /**
  * Used to generate a 2FA secret and store in it in the database
  * Sends QR code and secret to the client
  */
-const create2FA = async (req: Request, res: Response, next: NextFunction) => {
-  const { id } = req.params;
+const create2FA = async (
+  req: ValidatedRequest<typeof userRequestSchemas.create2FASchema>,
+  res: Response,
+  next: NextFunction
+) => {
+  const { username } = req.params;
 
-  const user = await User.fromId(id);
-  if (user.err) return next(new APIServerError("Failed to fetch user"));
-  if (!user.val) return next(new APINotFoundError("User not found"));
+  const user = await User.fromUsername(username);
+  if (user.err)
+    return next(new APIErrors.APIServerError("Failed to fetch user"));
+  if (!user.val) return next(new APIErrors.APINotFoundError("User not found"));
 
   const secret = authenticator.generateSecret();
 
@@ -301,7 +192,9 @@ const create2FA = async (req: Request, res: Response, next: NextFunction) => {
   try {
     await newTOTP.save();
   } catch (err) {
-    return next(new APIServerError("Failed to generate new TOTP instance"));
+    return next(
+      new APIErrors.APIServerError("Failed to generate new TOTP instance")
+    );
   }
 
   const TOTPUrl = authenticator.keyuri(
@@ -314,36 +207,42 @@ const create2FA = async (req: Request, res: Response, next: NextFunction) => {
   try {
     userQR = await qr.toDataURL(TOTPUrl);
   } catch (err) {
-    return next(new APIServerError("Failed to generate 2FA QR code"));
+    return next(new APIErrors.APIServerError("Failed to generate 2FA QR code"));
   }
 
   return res.json({ qr: userQR, secret, totpId: newTOTP.id });
-  // TODO: Test
-}; // GET
+};
 
 const setTotpActive = async (
-  userId: string,
+  username: string,
   totpId: string,
   totp: string,
   active: boolean
-): Promise<Result<[User, UserTOTP], APIServerError | APIUnauthorizedError>> => {
-  const user = await User.fromId(userId);
+): Promise<
+  Result<
+    [User, UserTOTP],
+    APIErrors.APIServerError | APIErrors.APIUnauthorizedError
+  >
+> => {
+  const user = await User.fromUsername(username);
   if (user.err || !user.val)
-    return Err(new APIServerError("Failed to fetch user"));
+    return Err(new APIErrors.APIServerError("Failed to fetch user"));
 
   const userTOTP = await UserTOTP.byId(totpId, user.val);
   if (userTOTP.err || !userTOTP.val)
-    return Err(new APIServerError("Failed to fetch user totp"));
+    return Err(new APIErrors.APIServerError("Failed to fetch user totp"));
 
   const isValid = userTOTP.val.checkCode(totp);
-  if (isValid.err) return Err(new APIServerError("Failed to check TOTP"));
+  if (isValid.err)
+    return Err(new APIErrors.APIServerError("Failed to check TOTP"));
 
-  if (!isValid.val) return Err(new APIUnauthorizedError("Invalid TOTP"));
+  if (!isValid.val)
+    return Err(new APIErrors.APIUnauthorizedError("Invalid TOTP"));
 
   userTOTP.val.activated = active;
   const saveResult = await userTOTP.val.pcallSave();
   if (saveResult.err)
-    return Err(new APIServerError("Failed to update TOTP settings"));
+    return Err(new APIErrors.APIServerError("Failed to update TOTP settings"));
 
   return Ok([user.val, userTOTP.val]);
 };
@@ -352,14 +251,14 @@ const setTotpActive = async (
  * Used to verify 2FA secret and set the TOTP status to enabled
  */
 const activate2FA = async (
-  req: Request<{ id: string }, unknown, { totp: string; totpId: string }>,
+  req: ValidatedRequest<typeof userRequestSchemas.activate2FASchema>,
   res: Response,
   next: NextFunction
 ) => {
-  const { id } = req.params;
+  const { username } = req.params;
   const { totp, totpId } = req.body;
 
-  const activateTOTPResult = await setTotpActive(id, totpId, totp, true);
+  const activateTOTPResult = await setTotpActive(username, totpId, totp, true);
   if (activateTOTPResult.err) return next(activateTOTPResult.val);
 
   const [user] = activateTOTPResult.val;
@@ -380,22 +279,20 @@ const activate2FA = async (
   }
 
   return res.json({ success: true });
-
-  // TODO: Test
-}; // POST
+};
 
 /**
  * Used to verify 2FA secret and set the TOTP status to enabled
  */
-const disable2FA = async (
-  req: Request<{ id: string }, unknown, { totp: string; totpId: string }>,
+const deactivate2FA = async (
+  req: ValidatedRequest<typeof userRequestSchemas.deactivate2FASchema>,
   res: Response,
   next: NextFunction
 ) => {
-  const { id } = req.params;
+  const { username } = req.params;
   const { totp, totpId } = req.body;
 
-  const activateTOTPResult = await setTotpActive(id, totpId, totp, false);
+  const activateTOTPResult = await setTotpActive(username, totpId, totp, false);
   if (activateTOTPResult.err) return next(activateTOTPResult.val);
 
   const [user] = activateTOTPResult.val;
@@ -415,16 +312,19 @@ const disable2FA = async (
   }
 
   return res.json({ success: true });
+};
 
-  // TODO: Test
-}; // POST
+const getTOTP_IDs = async (
+  req: ValidatedRequest<typeof userRequestSchemas.getTOTP_IDsSchema>,
+  res: Response,
+  next: NextFunction
+) => {
+  const { username } = req.params;
 
-const getTOTP_IDs = async (req: Request, res: Response, next: NextFunction) => {
-  const { id } = req.params;
-
-  const user = await User.fromId(id);
-  if (user.err) return next(new APIServerError("Failed to fetch user"));
-  if (!user.val) return next(new APINotFoundError("User not found"));
+  const user = await User.fromUsername(username);
+  if (user.err)
+    return next(new APIErrors.APIServerError("Failed to fetch user"));
+  if (!user.val) return next(new APIErrors.APINotFoundError("User not found"));
 
   try {
     const userTOTPs = await UserTOTP.find({
@@ -433,7 +333,7 @@ const getTOTP_IDs = async (req: Request, res: Response, next: NextFunction) => {
     return res.json(userTOTPs.map((userTOTP) => ({ totpId: userTOTP.id })));
   } catch (err) {
     console.error(err);
-    return next(new APIServerError("Failed to fetch 2FA"));
+    return next(new APIErrors.APIServerError("Failed to fetch 2FA"));
   }
 };
 
@@ -441,12 +341,10 @@ export {
   filterUserController,
   getUserController,
   createUserController,
-  getFriendRequestsController,
-  sendFriendRequestsController,
   getUserFriendsController,
-  isUsernameTakenController,
+  isUsernameAvailableController,
   create2FA,
   activate2FA,
-  disable2FA,
+  deactivate2FA,
   getTOTP_IDs
 };

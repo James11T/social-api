@@ -28,7 +28,6 @@ const countOccurrences = (str: string, match: RegExp): number => {
  */
 const stripFileExtension = (filename: string): string => {
   return filename.substring(0, filename.lastIndexOf(".")) || filename;
-  // TODO: Test
 };
 
 /**

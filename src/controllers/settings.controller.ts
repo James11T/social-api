@@ -6,9 +6,7 @@ import type { Request, Response } from "express";
  * @param req Express request object
  * @param res Express response object
  */
-const getSettingsController = async (req: Request, res: Response) => {
-  // TODO: Implement
-}; // GET
+const getSettingsController = async (req: Request, res: Response) => {};
 
 /**
  * Get a specific setting for the current user
@@ -16,20 +14,12 @@ const getSettingsController = async (req: Request, res: Response) => {
  * @param req Express request object
  * @param res Express response object
  */
-const getSpecificSettingController = async (req: Request, res: Response) => {
-  // TODO: Implement
-}; // GET
+const getSpecificSettingController = async (req: Request, res: Response) => {};
 
 /**
  * Set a specific setting for the current user
- *
- * @param req Express request object
- * @param res Express response object
  */
-const setSettingController = async (req: Request, res: Response) => {
-  // TODO: Implement
-}; // PATCH
-
+const setSettingController = async (req: Request, res: Response) => {};
 export {
   getSettingsController,
   getSpecificSettingController,

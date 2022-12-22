@@ -62,8 +62,6 @@ const loadTemplate = (dirName: string): APITemplate => {
   const fallback = loadFallback(dirName);
 
   return { render, fallback };
-
-  // TODO: Test
 };
 
 /**
@@ -89,8 +87,6 @@ const loadTemplates = () => {
   });
 
   return templates;
-
-  // TODO: Test
 };
 
 /**
@@ -122,8 +118,6 @@ const sendTemplate = async (
     html,
     text
   });
-
-  // TODO: Test
 };
 
 const templates = loadTemplates();

@@ -6,6 +6,7 @@ import postsRouter from "./posts.route";
 import statusRouter from "./status.route";
 import settingsRouter from "./settings.route";
 import commentsRouter from "./comments.route";
+import friendRequestsRouter from "./friendRequests";
 import { authenticate } from "../middleware/auth.middleware";
 
 const baseRouter = Router();
@@ -19,5 +20,6 @@ baseRouter.use("/likes", likesRouter);
 baseRouter.use("/posts", postsRouter);
 baseRouter.use("/settings", settingsRouter);
 baseRouter.use("/users", usersRouter);
+baseRouter.use("/friend-requests", friendRequestsRouter);
 
 export default baseRouter;
