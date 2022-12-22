@@ -5,8 +5,9 @@
   "type": "commonjs",
   "main": "dist/index.js",
   "scripts": {
+    "serve": "serve dist/index.js",
     "start": "ts-node dist/index.js",
-    "dev": "cross-env NODE_ENV=development nodemon src/index.ts",
+    "dev": "cross-env NODE_ENV=development TS_NODE_FILES=true TS_NODE_TRANSPILE_ONLY=true nodemon src/index.ts",
     "build": "tsc",
     "test": "vitest",
     "lint": "eslint src/**/*.ts",
@@ -40,13 +41,13 @@
     "parse-duration": "^1.0.2",
     "qrcode": "^1.5.0",
     "reflect-metadata": "^0.1.13",
+    "serve": "^14.1.2",
     "ts-results": "^3.3.0",
     "typeorm": "^0.3.10",
     "uuid": "^8.3.2",
     "zod": "^3.20.2"
   },
   "devDependencies": {
-    "@swc/core": "^1.2.215",
     "@types/bytes": "^3.1.1",
     "@types/cookie-parser": "^1.4.3",
     "@types/cors": "^2.8.12",
