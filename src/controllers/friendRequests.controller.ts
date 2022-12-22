@@ -1,8 +1,8 @@
+import * as APIErrors from "../errors/api";
+import * as friendRequestSchemas from "../validation/friendRequests.validation";
 import { Friendship, User } from "../models";
 import { FriendshipState } from "../models/friendship.model";
-import * as APIErrors from "../errors/api";
 import { ValidatedRequest } from "../middleware/validation.middleware";
-import * as friendRequestSchemas from "../validation/friendRequests.validation";
 import type { Response, NextFunction } from "express";
 
 /**

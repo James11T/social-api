@@ -1,6 +1,6 @@
+import { Entity, Column, PrimaryColumn, BaseEntity, ManyToOne } from "typeorm";
 import { User } from "./user.model";
 import { Post } from "./post.model";
-import { Entity, Column, PrimaryColumn, BaseEntity, ManyToOne } from "typeorm";
 import type { Relation } from "typeorm";
 
 @Entity()

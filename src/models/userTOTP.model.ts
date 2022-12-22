@@ -1,8 +1,5 @@
-import BaseModel from "./base";
-import { User } from "./user.model";
 import { Err, Ok } from "ts-results";
 import { authenticator } from "otplib";
-import { uuid } from "../utils/strings";
 import {
   Entity,
   Column,
@@ -10,6 +7,9 @@ import {
   ManyToOne,
   BeforeInsert
 } from "typeorm";
+import BaseModel from "./base";
+import { User } from "./user.model";
+import { uuid } from "../utils/strings";
 import type { Relation } from "typeorm";
 import type { Result } from "ts-results";
 

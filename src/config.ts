@@ -1,6 +1,6 @@
-import { argon2id } from "argon2";
 import bytes from "bytes";
 import parseDuration from "parse-duration";
+import { argon2id } from "argon2";
 
 const { NODE_ENV, SEND_EMAILS_IN_DEV } = process.env;
 

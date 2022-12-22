@@ -11,10 +11,7 @@ import {
   getTOTP_IDs
 } from "../controllers/users.controller";
 import { protect } from "../middleware/auth.middleware";
-import {
-  validate,
-  ValidatedRequest
-} from "../middleware/validation.middleware";
+import { validate } from "../middleware/validation.middleware";
 import {
   activate2FASchema,
   create2FASchema,

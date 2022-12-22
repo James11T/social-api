@@ -1,6 +1,6 @@
+import { Ok, Err } from "ts-results";
 import BaseModel from "./base";
 import { Post } from "./post.model";
-import { Ok, Err } from "ts-results";
 import { uuid } from "../utils/strings";
 import { UserTOTP } from "./userTOTP.model";
 import { Friendship } from "./friendship.model";

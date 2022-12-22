@@ -1,5 +1,5 @@
-import { Post } from "./post.model";
 import { Entity, Column, PrimaryColumn, BaseEntity, ManyToOne } from "typeorm";
+import { Post } from "./post.model";
 import type { Relation } from "typeorm";
 
 @Entity()

@@ -5,8 +5,6 @@
   "type": "commonjs",
   "main": "dist/index.js",
   "scripts": {
-    "watch": "tsc -w -noEmit",
-    "serve": "nodemon dist/index.js -d 1",
     "start": "ts-node dist/index.js",
     "dev": "cross-env NODE_ENV=development nodemon src/index.ts",
     "build": "tsc",
@@ -68,7 +66,6 @@
     "@typescript-eslint/eslint-plugin": "^5.47.0",
     "@typescript-eslint/parser": "^5.47.0",
     "cross-env": "^7.0.3",
-    "eslint-plugin-import": "^2.26.0",
     "nodemon": "^2.0.19",
     "prettier": "^2.8.0",
     "supertest": "^6.2.3",

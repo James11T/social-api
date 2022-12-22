@@ -1,7 +1,7 @@
-import BaseModel from "./base";
-import { User } from "./user.model";
 import { Ok, Err } from "ts-results";
 import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from "typeorm";
+import BaseModel from "./base";
+import { User } from "./user.model";
 import type { Relation } from "typeorm";
 import type { Result } from "ts-results";
 

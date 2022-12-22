@@ -1,11 +1,11 @@
 import * as APIErrors from "../errors/api";
+import * as postRequestSchemas from "../validation/posts.validation";
 import { uuid } from "../utils/strings";
 import AppDataSource from "../database";
 import { WEB_CONSTANTS } from "../config";
 import { uploadFile } from "../services/s3";
 import { alwaysArray } from "../utils/array";
 import { Post, PostMedia } from "../models";
-import * as postRequestSchemas from "../validation/posts.validation";
 import { ValidatedRequest } from "../middleware/validation.middleware";
 import type { NextFunction, Request, Response } from "express";
 

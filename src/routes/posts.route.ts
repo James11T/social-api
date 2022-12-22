@@ -1,4 +1,5 @@
 import { Router } from "express";
+import fileUpload from "express-fileupload";
 import {
   queryPostsController,
   createPostController,
@@ -6,7 +7,6 @@ import {
   deletePostController,
   editPostController
 } from "../controllers/posts.controller";
-import fileUpload from "express-fileupload";
 import { POST_CONSTANTS } from "../config";
 import { protect } from "../middleware/auth.middleware";
 import { validate } from "../middleware/validation.middleware";
