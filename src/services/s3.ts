@@ -2,21 +2,16 @@ import AWS from "aws-sdk";
 import { Err, Ok } from "ts-results";
 import type { Result } from "ts-results";
 
-const {
-  AWS_ACCESS_KEY_ID,
-  AWS_SECRET_ACCESS_KEY,
-  AWS_REGION,
-  AWS_S3_IMAGE_BUCKET
-} = process.env;
+const { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, AWS_S3_IMAGE_BUCKET } = process.env;
 
 AWS.config.update({
   accessKeyId: AWS_ACCESS_KEY_ID,
   secretAccessKey: AWS_SECRET_ACCESS_KEY,
-  region: AWS_REGION
+  region: AWS_REGION,
 });
 
 export const s3 = new AWS.S3({
-  apiVersion: "latest"
+  apiVersion: "latest",
 });
 
 /**
@@ -36,7 +31,7 @@ const uploadFile = async (
   const params = {
     Bucket: bucket,
     Key: key,
-    Body: file
+    Body: file,
   };
 
   try {

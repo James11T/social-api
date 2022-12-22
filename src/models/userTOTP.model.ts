@@ -1,12 +1,6 @@
 import { Err, Ok } from "ts-results";
 import { authenticator } from "otplib";
-import {
-  Entity,
-  Column,
-  PrimaryColumn,
-  ManyToOne,
-  BeforeInsert
-} from "typeorm";
+import { Entity, Column, PrimaryColumn, ManyToOne, BeforeInsert } from "typeorm";
 import BaseModel from "./base";
 import { User } from "./user.model";
 import { uuid } from "../utils/strings";
@@ -34,9 +28,7 @@ export class UserTOTP extends BaseModel {
     this.id = this.id ?? uuid();
   }
 
-  public checkCode(
-    token: string
-  ): Result<boolean, "INVALID_TOTP" | "FAILED_TO_VERIFY_TOTP"> {
+  public checkCode(token: string): Result<boolean, "INVALID_TOTP" | "FAILED_TO_VERIFY_TOTP"> {
     if (token.length < 6) return Err("INVALID_TOTP");
 
     try {
@@ -55,7 +47,7 @@ export class UserTOTP extends BaseModel {
     try {
       const userTotp = await UserTOTP.findOneBy({
         id,
-        user: user ? { id: user.id } : undefined
+        user: user ? { id: user.id } : undefined,
       });
       return Ok(userTotp);
     } catch (err) {

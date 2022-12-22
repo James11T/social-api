@@ -3,32 +3,20 @@ import {
   authenticateController,
   resetPasswordController,
   whoAmIController,
-  refreshAccessController
+  refreshAccessController,
 } from "../controllers/auth.controller";
 import { validate } from "../middleware/validation.middleware";
 import {
   authenticateSchema,
   refreshAccessSchema,
-  resetPasswordSchema
+  resetPasswordSchema,
 } from "../validation/auth.validation";
 
 const authRouter = Router();
 
-authRouter.post(
-  "/authenticate",
-  validate(authenticateSchema),
-  authenticateController
-);
-authRouter.post(
-  "/refresh",
-  validate(refreshAccessSchema),
-  refreshAccessController
-);
-authRouter.get(
-  "/:userId/reset-password/",
-  validate(resetPasswordSchema),
-  resetPasswordController
-);
+authRouter.post("/authenticate", validate(authenticateSchema), authenticateController);
+authRouter.post("/refresh", validate(refreshAccessSchema), refreshAccessController);
+authRouter.get("/:userId/reset-password/", validate(resetPasswordSchema), resetPasswordController);
 authRouter.get("/whoami", whoAmIController);
 
 export default authRouter;

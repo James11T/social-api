@@ -8,7 +8,7 @@ import type { Result } from "ts-results";
 enum FriendshipState {
   NOT_FRIENDS,
   PENDING,
-  FRIENDS
+  FRIENDS,
 }
 
 @Entity()
@@ -44,8 +44,8 @@ export class Friendship extends BaseModel {
       const friendship = await Friendship.findOne({
         where: [
           { userFromId: user1.id, userToId: user2.id },
-          { userFromId: user2.id, userToId: user1.id }
-        ]
+          { userFromId: user2.id, userToId: user1.id },
+        ],
       });
 
       if (!friendship) return Ok(FriendshipState.NOT_FRIENDS);

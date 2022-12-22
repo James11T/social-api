@@ -8,7 +8,7 @@ import {
   create2FA,
   deactivate2FA,
   activate2FA,
-  getTOTP_IDs
+  getTOTP_IDs,
 } from "../controllers/users.controller";
 import { protect } from "../middleware/auth.middleware";
 import { validate } from "../middleware/validation.middleware";
@@ -21,7 +21,7 @@ import {
   getTOTP_IDsSchema,
   getUserFriendsSchema,
   getUserSchema,
-  isUsernameAvailableSchema
+  isUsernameAvailableSchema,
 } from "../validation/users.validation";
 
 const usersRouter = Router(); // /users
@@ -36,37 +36,18 @@ usersRouter.get(
   isUsernameAvailableController
 );
 
-usersRouter.get(
-  "/:username/friends",
-  validate(getUserFriendsSchema),
-  getUserFriendsController
-);
+usersRouter.get("/:username/friends", validate(getUserFriendsSchema), getUserFriendsController);
 
 // usersRouter.post("/:id/change-password", validateChangePassword, changePasswordController);
 
-usersRouter.post(
-  "/:username/2fa/create",
-  protect,
-  validate(create2FASchema),
-  create2FA
-);
-usersRouter.post(
-  "/:username/2fa/activate",
-  protect,
-  validate(activate2FASchema),
-  activate2FA
-);
+usersRouter.post("/:username/2fa/create", protect, validate(create2FASchema), create2FA);
+usersRouter.post("/:username/2fa/activate", protect, validate(activate2FASchema), activate2FA);
 usersRouter.post(
   "/:username/2fa/deactivate",
   protect,
   validate(deactivate2FASchema),
   deactivate2FA
 );
-usersRouter.post(
-  "/:username/2fa/status",
-  protect,
-  validate(getTOTP_IDsSchema),
-  getTOTP_IDs
-);
+usersRouter.post("/:username/2fa/status", protect, validate(getTOTP_IDsSchema), getTOTP_IDs);
 
 export default usersRouter;

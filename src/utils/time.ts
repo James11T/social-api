@@ -5,10 +5,7 @@
  * @param date Optional date to get the epoch for
  * @returns Current epoch in ms
  */
-const getEpoch = ({
-  date,
-  truncate = false
-}: { date?: Date; truncate?: boolean } = {}): number => {
+const getEpoch = ({ date, truncate = false }: { date?: Date; truncate?: boolean } = {}): number => {
   const now = Number(date ? date : new Date()) / 1000;
   if (truncate) return Math.floor(now);
   return now;

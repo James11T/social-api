@@ -1,7 +1,7 @@
 import { Router } from "express";
 import {
   getFriendRequestsController,
-  sendFriendRequestController
+  sendFriendRequestController,
 } from "../controllers/friendRequests.controller";
 import { protect } from "../middleware/auth.middleware";
 

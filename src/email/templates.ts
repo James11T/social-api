@@ -37,10 +37,7 @@ const loadFallback = (dirName: string) => {
   if (!fs.existsSync(dirName)) {
     fallback = NO_FALLBACK;
   } else {
-    fallback = fs.readFileSync(
-      `${TEMPLATE_DIR}${dirName}/fallback.txt`,
-      "utf8"
-    );
+    fallback = fs.readFileSync(`${TEMPLATE_DIR}${dirName}/fallback.txt`, "utf8");
   }
 
   return handlebars.compile(fallback);
@@ -53,10 +50,7 @@ const loadFallback = (dirName: string) => {
  * @returns Template file render function with a list of attachments
  */
 const loadTemplate = (dirName: string): APITemplate => {
-  const template = fs.readFileSync(
-    `${TEMPLATE_DIR}${dirName}/template.hbs`,
-    "utf8"
-  );
+  const template = fs.readFileSync(`${TEMPLATE_DIR}${dirName}/template.hbs`, "utf8");
 
   const render = handlebars.compile(template);
   const fallback = loadFallback(dirName);
@@ -116,7 +110,7 @@ const sendTemplate = async (
   await sendEmail(to, {
     ...options,
     html,
-    text
+    text,
   });
 };
 

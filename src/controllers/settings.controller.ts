@@ -20,8 +20,4 @@ const getSpecificSettingController = async (req: Request, res: Response) => {};
  * Set a specific setting for the current user
  */
 const setSettingController = async (req: Request, res: Response) => {};
-export {
-  getSettingsController,
-  getSpecificSettingController,
-  setSettingController
-};
+export { getSettingsController, getSpecificSettingController, setSettingController };

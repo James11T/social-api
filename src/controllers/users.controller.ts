@@ -26,9 +26,9 @@ const filterUserController = async (
   try {
     const users = await User.find({
       where: {
-        username: Like(`%${username}%`)
+        username: Like(`%${username}%`),
       },
-      take: Number(limit)
+      take: Number(limit),
     });
     return res.json(users);
   } catch (err) {
@@ -64,30 +64,20 @@ const createUserController = async (
   res: Response,
   next: NextFunction
 ) => {
-  if (req.user)
-    return next(
-      new APIErrors.APIBadRequestError("Cannot sign up while authenticated")
-    );
+  if (req.user) return next(new APIErrors.APIBadRequestError("Cannot sign up while authenticated"));
 
   const { username, email, password } = req.body;
 
   const getUsername = await User.fromUsername(username);
   if (getUsername.err)
-    return next(
-      new APIErrors.APIServerError("Failed to check username availability")
-    );
+    return next(new APIErrors.APIServerError("Failed to check username availability"));
 
-  if (getUsername.val)
-    return next(
-      new APIErrors.APIConflictError("Username is taken or reserved")
-    );
+  if (getUsername.val) return next(new APIErrors.APIConflictError("Username is taken or reserved"));
 
   const getEmail = await User.fromEmail(email);
-  if (getEmail.err)
-    return next(new APIErrors.APIServerError("Failed to check email status"));
+  if (getEmail.err) return next(new APIErrors.APIServerError("Failed to check email status"));
 
-  if (getEmail.val)
-    return next(new APIErrors.APIConflictError("Email is already in use"));
+  if (getEmail.val) return next(new APIErrors.APIConflictError("Email is already in use"));
 
   const passwordHash = await hashPassword(password);
   if (passwordHash.err) {
@@ -115,16 +105,14 @@ const createUserController = async (
       "confirmEmail",
       {
         name: username,
-        link: `${WEB_CONSTANTS.URL}email/verify?c=${verificationToken}`
+        link: `${WEB_CONSTANTS.URL}email/verify?c=${verificationToken}`,
       },
       { subject: "Confirm your email" }
     );
   } catch (err) {
     console.error(err);
 
-    return next(
-      new APIErrors.APIServerError("Failed to send confirmation email")
-    );
+    return next(new APIErrors.APIServerError("Failed to send confirmation email"));
   }
 
   return res.json({ success: true, id: newUser.id });
@@ -147,8 +135,7 @@ const getUserFriendsController = async (
 
   const friends = await user.val.getFriends();
 
-  if (friends.err)
-    return next(new APIErrors.APIServerError("Failed to get friend requests"));
+  if (friends.err) return next(new APIErrors.APIServerError("Failed to get friend requests"));
 
   return res.json(friends.val);
 };
@@ -161,8 +148,7 @@ const isUsernameAvailableController = async (
   const { username } = req.params;
 
   const user = await User.fromUsername(username);
-  if (user.err)
-    return next(new APIErrors.APIServerError("Failed to check username"));
+  if (user.err) return next(new APIErrors.APIServerError("Failed to check username"));
 
   return res.json({ available: !user.val });
 };
@@ -179,8 +165,7 @@ const create2FA = async (
   const { username } = req.params;
 
   const user = await User.fromUsername(username);
-  if (user.err)
-    return next(new APIErrors.APIServerError("Failed to fetch user"));
+  if (user.err) return next(new APIErrors.APIServerError("Failed to fetch user"));
   if (!user.val) return next(new APIErrors.APINotFoundError("User not found"));
 
   const secret = authenticator.generateSecret();
@@ -192,16 +177,10 @@ const create2FA = async (
   try {
     await newTOTP.save();
   } catch (err) {
-    return next(
-      new APIErrors.APIServerError("Failed to generate new TOTP instance")
-    );
+    return next(new APIErrors.APIServerError("Failed to generate new TOTP instance"));
   }
 
-  const TOTPUrl = authenticator.keyuri(
-    user.val.email,
-    TOTP_CONSTANTS.SERVICE,
-    secret
-  );
+  const TOTPUrl = authenticator.keyuri(user.val.email, TOTP_CONSTANTS.SERVICE, secret);
 
   let userQR: string;
   try {
@@ -218,31 +197,22 @@ const setTotpActive = async (
   totpId: string,
   totp: string,
   active: boolean
-): Promise<
-  Result<
-    [User, UserTOTP],
-    APIErrors.APIServerError | APIErrors.APIUnauthorizedError
-  >
-> => {
+): Promise<Result<[User, UserTOTP], APIErrors.APIServerError | APIErrors.APIUnauthorizedError>> => {
   const user = await User.fromUsername(username);
-  if (user.err || !user.val)
-    return Err(new APIErrors.APIServerError("Failed to fetch user"));
+  if (user.err || !user.val) return Err(new APIErrors.APIServerError("Failed to fetch user"));
 
   const userTOTP = await UserTOTP.byId(totpId, user.val);
   if (userTOTP.err || !userTOTP.val)
     return Err(new APIErrors.APIServerError("Failed to fetch user totp"));
 
   const isValid = userTOTP.val.checkCode(totp);
-  if (isValid.err)
-    return Err(new APIErrors.APIServerError("Failed to check TOTP"));
+  if (isValid.err) return Err(new APIErrors.APIServerError("Failed to check TOTP"));
 
-  if (!isValid.val)
-    return Err(new APIErrors.APIUnauthorizedError("Invalid TOTP"));
+  if (!isValid.val) return Err(new APIErrors.APIUnauthorizedError("Invalid TOTP"));
 
   userTOTP.val.activated = active;
   const saveResult = await userTOTP.val.pcallSave();
-  if (saveResult.err)
-    return Err(new APIErrors.APIServerError("Failed to update TOTP settings"));
+  if (saveResult.err) return Err(new APIErrors.APIServerError("Failed to update TOTP settings"));
 
   return Ok([user.val, userTOTP.val]);
 };
@@ -269,7 +239,7 @@ const activate2FA = async (
       "2FAEnabled",
       {
         name: user.username,
-        ip: req.realIp
+        ip: req.realIp,
       },
       { subject: "A new 2FA source has been activated on your account" }
     );
@@ -303,7 +273,7 @@ const deactivate2FA = async (
       "2FADisabled",
       {
         name: user.username,
-        ip: req.realIp
+        ip: req.realIp,
       },
       { subject: "2FA Disabled" }
     );
@@ -322,13 +292,12 @@ const getTOTP_IDs = async (
   const { username } = req.params;
 
   const user = await User.fromUsername(username);
-  if (user.err)
-    return next(new APIErrors.APIServerError("Failed to fetch user"));
+  if (user.err) return next(new APIErrors.APIServerError("Failed to fetch user"));
   if (!user.val) return next(new APIErrors.APINotFoundError("User not found"));
 
   try {
     const userTOTPs = await UserTOTP.find({
-      where: { user: { id: user.val.id }, activated: true }
+      where: { user: { id: user.val.id }, activated: true },
     });
     return res.json(userTOTPs.map((userTOTP) => ({ totpId: userTOTP.id })));
   } catch (err) {
@@ -346,5 +315,5 @@ export {
   create2FA,
   activate2FA,
   deactivate2FA,
-  getTOTP_IDs
+  getTOTP_IDs,
 };

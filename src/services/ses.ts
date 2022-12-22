@@ -3,8 +3,7 @@ import nodemailer from "nodemailer";
 import { RUNTIME_CONSTANTS, WEB_CONSTANTS } from "../config";
 import type { Attachment } from "nodemailer/lib/mailer";
 
-const { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, WEB_DOMAIN } =
-  process.env;
+const { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, WEB_DOMAIN } = process.env;
 
 interface EmailOptions {
   name: string;
@@ -18,20 +17,20 @@ interface EmailOptions {
 AWS.config.update({
   accessKeyId: AWS_ACCESS_KEY_ID,
   secretAccessKey: AWS_SECRET_ACCESS_KEY,
-  region: AWS_REGION
+  region: AWS_REGION,
 });
 
 const ses = new AWS.SES({ apiVersion: "latest", sslEnabled: true });
 
 const transporter = nodemailer.createTransport({
   SES: ses,
-  sendingRate: 1
+  sendingRate: 1,
 });
 
 const defaultOptions: EmailOptions = {
   name: "Kakapo",
   user: "no-reply",
-  subject: "Kakapo Social Update"
+  subject: "Kakapo Social Update",
 };
 
 /**
@@ -40,10 +39,7 @@ const defaultOptions: EmailOptions = {
  * @param to Email recipient(s)
  * @param options Additional email options
  */
-const sendEmail = async (
-  to: string | string[],
-  options: Partial<EmailOptions>
-) => {
+const sendEmail = async (to: string | string[], options: Partial<EmailOptions>) => {
   if (!RUNTIME_CONSTANTS.CAN_SEND_EMAILS) return;
 
   const combinedOptions: EmailOptions = { ...defaultOptions, ...options };
@@ -51,13 +47,13 @@ const sendEmail = async (
   await transporter.sendMail({
     from: {
       name: combinedOptions.name,
-      address: `${combinedOptions.user}@${WEB_CONSTANTS.MAIL_SUBDOMAIN}.${WEB_DOMAIN}`
+      address: `${combinedOptions.user}@${WEB_CONSTANTS.MAIL_SUBDOMAIN}.${WEB_DOMAIN}`,
     },
     to,
     subject: combinedOptions.subject,
     text: combinedOptions.text,
     html: combinedOptions.html,
-    attachments: combinedOptions.attachments
+    attachments: combinedOptions.attachments,
   });
 };
 

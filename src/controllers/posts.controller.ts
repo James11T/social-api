@@ -25,13 +25,8 @@ const createPostController = async (
   next: NextFunction
 ) => {
   if (!req.user)
-    return next(
-      new APIErrors.APIUnauthorizedError(
-        "You must be authenticated to create posts"
-      )
-    );
-  if (!req.files)
-    return next(new APIErrors.APIBadRequestError("No files submitted"));
+    return next(new APIErrors.APIUnauthorizedError("You must be authenticated to create posts"));
+  if (!req.files) return next(new APIErrors.APIBadRequestError("No files submitted"));
 
   const files = alwaysArray(req.files.media);
   const postId = uuid();
@@ -81,7 +76,7 @@ const createPostController = async (
 
   return res.json({
     media: uploads,
-    postId
+    postId,
   });
 };
 
@@ -111,5 +106,5 @@ export {
   createPostController,
   getPostController,
   deletePostController,
-  editPostController
+  editPostController,
 };

@@ -22,9 +22,4 @@ const createLikeController = async (req: Request, res: Response) => {};
  */
 const countLikeController = async (req: Request, res: Response) => {};
 
-export {
-  queryLikeController,
-  deleteLikeController,
-  createLikeController,
-  countLikeController
-};
+export { queryLikeController, deleteLikeController, createLikeController, countLikeController };

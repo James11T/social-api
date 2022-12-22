@@ -1,12 +1,7 @@
 import { APIBaseError } from "../errors/api";
 import type { Request, Response, NextFunction } from "express";
 
-const errorHandler = (
-  err: Error | string,
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const errorHandler = (err: Error | string, req: Request, res: Response, next: NextFunction) => {
   if (typeof err === "string") {
     const errorCodes = err.match(/^([45]\d\d)_(.+)$/); // Split 404_ERROR into 404_ERROR, 404, and ERROR
     if (!errorCodes || errorCodes.length < 3)
@@ -18,7 +13,7 @@ const errorHandler = (
   } else if (err instanceof SyntaxError) {
     // Usually when express.json fails
     return res.status(400).json({
-      error: "The supplied data was malformed"
+      error: "The supplied data was malformed",
     });
   }
 

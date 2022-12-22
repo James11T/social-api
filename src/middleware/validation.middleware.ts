@@ -9,8 +9,7 @@ type ValidationSchema = ZodObject<{
 }>;
 
 const validate =
-  (schema: ValidationSchema) =>
-  async (req: Request, res: Response, next: NextFunction) => {
+  (schema: ValidationSchema) => async (req: Request, res: Response, next: NextFunction) => {
     const parseResult = await schema.safeParseAsync(req);
 
     if (!parseResult.success) {

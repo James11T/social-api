@@ -20,10 +20,7 @@ const templateFolders = fs
 const templates: Record<string, HandlebarsTemplateDelegate> = {};
 
 for (const templateDir of templateFolders) {
-  const content = fs.readFileSync(
-    `${TEMPLATE_DIR}${templateDir.name}/template.hbs`,
-    "utf8"
-  );
+  const content = fs.readFileSync(`${TEMPLATE_DIR}${templateDir.name}/template.hbs`, "utf8");
   templates[templateDir.name] = handlebars.compile(content);
 }
 
@@ -45,7 +42,7 @@ app.get("/:template", (req, res) => {
   return res.send(
     templates[template]({
       name: "Username",
-      request: { ip: "127.0.0.1", flag: "🌍" }
+      request: { ip: "127.0.0.1", flag: "🌍" },
     })
   );
 });

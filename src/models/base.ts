@@ -8,9 +8,7 @@ class BaseModel extends BaseEntity {
     super();
   }
 
-  async pcallSave(
-    options?: SaveOptions
-  ): Promise<Result<this, "FAILED_TO_SAVE">> {
+  async pcallSave(options?: SaveOptions): Promise<Result<this, "FAILED_TO_SAVE">> {
     try {
       const res = await this.save(options);
       return Ok(res);

@@ -5,9 +5,7 @@ import type { Request, Response, NextFunction } from "express";
 
 const setRealIp = (req: Request, res: Response, next: NextFunction) => {
   const ip =
-    req.header("x-real-ip") ??
-    req.header("cf-connecting-ip") ??
-    req.header("x-forwarded-for");
+    req.header("x-real-ip") ?? req.header("cf-connecting-ip") ?? req.header("x-forwarded-for");
 
   req.realIp = ip ?? req.ip;
   next();
@@ -29,7 +27,7 @@ const methods: { [key: string]: string } = {
   POST: chalk.bold.green("POST"),
   DELETE: chalk.bold.red("DELETE"),
   PUT: chalk.bold.yellow("PUT"),
-  PATCH: chalk.bold.yellow("PATCH")
+  PATCH: chalk.bold.yellow("PATCH"),
 };
 
 const logRequest = (req: Request, res: Response, next: NextFunction) => {
@@ -40,7 +38,7 @@ const logRequest = (req: Request, res: Response, next: NextFunction) => {
       req.realIp,
       req.originalUrl,
       "->",
-      colorizeHTTPCode(res.statusCode)
+      colorizeHTTPCode(res.statusCode),
     ];
     console.log(output.join(" "));
   });

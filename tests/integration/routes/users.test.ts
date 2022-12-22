@@ -14,9 +14,9 @@ const testUsers: UserType[] = [
     friends: [
       {
         userId: "testuser2",
-        status: "friend"
-      }
-    ]
+        status: "friend",
+      },
+    ],
   },
   {
     userId: "testuser2",
@@ -25,9 +25,9 @@ const testUsers: UserType[] = [
     friends: [
       {
         userId: "testuser1",
-        status: "friend"
-      }
-    ]
+        status: "friend",
+      },
+    ],
   },
   {
     userId: "testuser3",
@@ -36,9 +36,9 @@ const testUsers: UserType[] = [
     friends: [
       {
         userId: "testuser4",
-        status: "pendingInbound"
-      }
-    ]
+        status: "pendingInbound",
+      },
+    ],
   },
   {
     userId: "testuser4",
@@ -47,10 +47,10 @@ const testUsers: UserType[] = [
     friends: [
       {
         userId: "testuser3",
-        status: "pendingOutbound"
-      }
-    ]
-  }
+        status: "pendingOutbound",
+      },
+    ],
+  },
 ];
 
 let mongoServer: MongoMemoryServer;
@@ -104,18 +104,14 @@ describe("GET /users?id=testuser", () => {
 
 describe("GET /users/:userId/friendRequests", () => {
   it("should return status code 200 and 0 friend requests", async () => {
-    const res = await request(app).get(
-      "/api/v1/users/testuser1/friendRequests"
-    );
+    const res = await request(app).get("/api/v1/users/testuser1/friendRequests");
 
     expect(res.status).toBe(200);
     expect(res.body.length).toBe(0);
   });
 
   it("should return status code 200 and 1 friend requests", async () => {
-    const res = await request(app).get(
-      "/api/v1/users/testuser3/friendRequests"
-    );
+    const res = await request(app).get("/api/v1/users/testuser3/friendRequests");
 
     console.log(res.body);
 
@@ -124,9 +120,7 @@ describe("GET /users/:userId/friendRequests", () => {
   });
 
   it("should return status code 200 and 0 friend requests for outbound friend request", async () => {
-    const res = await request(app).get(
-      "/api/v1/users/testuser4/friendRequests"
-    );
+    const res = await request(app).get("/api/v1/users/testuser4/friendRequests");
 
     expect(res.status).toBe(200);
     expect(res.body.length).toBe(0);

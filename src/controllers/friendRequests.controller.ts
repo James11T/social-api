@@ -44,45 +44,26 @@ const sendFriendRequestController = async (
   const fromUser = await User.fromUsername(from);
   const toUser = await User.fromUsername(to);
 
-  if (fromUser.err || toUser.err)
-    return next(new APIErrors.APIServerError("Failed to get users"));
-  if (!fromUser.val)
-    return next(
-      new APIErrors.APINotFoundError("Friend request sender not found")
-    );
+  if (fromUser.err || toUser.err) return next(new APIErrors.APIServerError("Failed to get users"));
+  if (!fromUser.val) return next(new APIErrors.APINotFoundError("Friend request sender not found"));
   if (!toUser.val)
-    return next(
-      new APIErrors.APINotFoundError("Friend request recipient not found")
-    );
+    return next(new APIErrors.APINotFoundError("Friend request recipient not found"));
 
   // Double check in case of formatting
   if (fromUser.val.id === toUser.val.id)
-    return next(
-      new APIErrors.APIBadRequestError(
-        "Cannot send a friend request to yourself"
-      )
-    );
+    return next(new APIErrors.APIBadRequestError("Cannot send a friend request to yourself"));
 
-  const friendshipState = await Friendship.getFriendshipState(
-    fromUser.val,
-    toUser.val
-  );
+  const friendshipState = await Friendship.getFriendshipState(fromUser.val, toUser.val);
 
   if (friendshipState.err)
-    return next(
-      new APIErrors.APIServerError("Failed to check friendship status")
-    );
+    return next(new APIErrors.APIServerError("Failed to check friendship status"));
 
   if (friendshipState.val === FriendshipState.PENDING) {
     return next(
-      new APIErrors.APIBadRequestError(
-        "You already have a pending friend request with this user"
-      )
+      new APIErrors.APIBadRequestError("You already have a pending friend request with this user")
     );
   } else if (friendshipState.val === FriendshipState.FRIENDS) {
-    return next(
-      new APIErrors.APIBadRequestError("You are already friends with this user")
-    );
+    return next(new APIErrors.APIBadRequestError("You are already friends with this user"));
   }
 
   try {
@@ -94,9 +75,7 @@ const sendFriendRequestController = async (
 
     return res.json({ success: true });
   } catch (err) {
-    return next(
-      new APIErrors.APIServerError("Failed to create friend request")
-    );
+    return next(new APIErrors.APIServerError("Failed to create friend request"));
   }
 };
 

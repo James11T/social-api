@@ -11,7 +11,7 @@ const { JWT_SECRET } = process.env;
 const hashingOptions = {
   type: HASHING_CONSTANTS.HASHING_FUNCTION,
   hashLength: HASHING_CONSTANTS.HASH_LENGTH_BYTES,
-  saltLength: HASHING_CONSTANTS.SALT_SIZE_BYTES
+  saltLength: HASHING_CONSTANTS.SALT_SIZE_BYTES,
 };
 
 /**
@@ -38,10 +38,7 @@ const hashPassword = async (
  * @param hash A password hash to validate against
  * @returns True if the password is valid
  */
-const verifyPassword = async (
-  password: string,
-  hash: string
-): Promise<boolean> => {
+const verifyPassword = async (password: string, hash: string): Promise<boolean> => {
   const isValid = await argon2.verify(hash, password, hashingOptions);
   return isValid;
 };

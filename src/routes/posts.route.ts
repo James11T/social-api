@@ -5,7 +5,7 @@ import {
   createPostController,
   getPostController,
   deletePostController,
-  editPostController
+  editPostController,
 } from "../controllers/posts.controller";
 import { POST_CONSTANTS } from "../config";
 import { protect } from "../middleware/auth.middleware";
@@ -21,8 +21,8 @@ postsRouter.post(
   fileUpload({
     limits: {
       files: POST_CONSTANTS.MAX_MEDIA_COUNT,
-      fileSize: POST_CONSTANTS.MAX_MEDIA_SIZE
-    }
+      fileSize: POST_CONSTANTS.MAX_MEDIA_SIZE,
+    },
   }),
   validate(createPostSchema),
   createPostController
