@@ -87,17 +87,11 @@ const getPostController = async (req: Request, res: Response) => {};
 
 /**
  * Delete a post by ID
- *
- * @param req Express request object
- * @param res Express response object
  */
 const deletePostController = async (req: Request, res: Response) => {};
 
 /**
  * Edit a post by ID based off the request body
- *
- * @param req Express request object
- * @param res Express response object
  */
 const editPostController = async (req: Request, res: Response) => {};
 

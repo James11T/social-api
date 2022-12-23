@@ -30,9 +30,6 @@ const getFriendRequestsController = async (
 
 /**
  * Send a friend request to the specified user as the currently authenticated user
- *
- * @param req Express request object
- * @param res Express response object
  */
 const sendFriendRequestController = async (
   req: ValidatedRequest<typeof friendRequestSchemas.sendFriendRequestSchema>,

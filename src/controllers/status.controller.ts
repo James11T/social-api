@@ -4,9 +4,6 @@ import type { Request, Response, NextFunction } from "express";
 
 /**
  * Responds with pong if API is alive
- *
- * @param req Express request object
- * @param res Express response object
  */
 const pingController = async (req: Request, res: Response, next: NextFunction) => {
   return res.json({
