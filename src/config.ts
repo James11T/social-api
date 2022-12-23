@@ -57,3 +57,5 @@ export const ACCESS_TOKEN_CONSTANTS = {
 export const TOTP_CONSTANTS = {
   SERVICE: "Kakapo",
 };
+
+export { isDevelopmentEnv };

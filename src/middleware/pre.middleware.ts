@@ -1,11 +1,14 @@
 import chalk from "chalk";
 import { IPToCountry } from "../utils/ip";
 import { colorizeHTTPCode } from "../utils/strings";
+import { isDevelopmentEnv } from "../config";
 import type { Request, Response, NextFunction } from "express";
 
 const setRealIp = (req: Request, res: Response, next: NextFunction) => {
-  const ip =
+  let ip =
     req.header("x-real-ip") ?? req.header("cf-connecting-ip") ?? req.header("x-forwarded-for");
+
+  if (isDevelopmentEnv && req.header("x-test-ip")) ip = ip ?? req.header("x-test-ip");
 
   req.realIp = ip ?? req.ip;
   next();

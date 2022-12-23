@@ -1,4 +1,5 @@
 import { RUNTIME_CONSTANTS } from "../config";
+import type { ZodIssue } from "zod";
 
 class APIBaseError extends Error {
   status: number;
@@ -56,12 +57,12 @@ class APIServerError extends APIBaseError {
   }
 }
 
-export type BadParams = Record<string, { location: string; message: string }>;
+export type BadParameter = { location: string; message: string; type: ZodIssue["code"] };
 
 class APIParameterError extends APIBadRequestError {
-  parameters: BadParams;
+  parameters: BadParameter[];
 
-  constructor(msg = "One or more supplied parameters are invalid", parameters: BadParams) {
+  constructor(msg = "One or more supplied parameters are invalid", parameters: BadParameter[]) {
     super(msg);
 
     this.parameters = parameters;

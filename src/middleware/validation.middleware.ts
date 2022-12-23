@@ -13,8 +13,12 @@ const validate =
     const parseResult = await schema.safeParseAsync(req);
 
     if (!parseResult.success) {
-      console.log(parseResult.error);
-      return next(new APIParameterError("", {}));
+      const processedErrors = parseResult.error.issues.map((issue) => ({
+        location: issue.path.join("."),
+        message: issue.message,
+        type: issue.code,
+      }));
+      return next(new APIParameterError("Invalid parameters", processedErrors));
     }
 
     next();
