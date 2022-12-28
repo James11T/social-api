@@ -1,6 +1,6 @@
 import { Err, Ok } from "ts-results";
 import { DataSource } from "typeorm";
-import { User, Friendship, Post, PostMedia, UserTOTP, RefreshToken } from "../models";
+import { User, Friendship, Post, PostMedia, UserTOTP, RefreshToken, Comment } from "../models";
 import type { Result } from "ts-results";
 
 const { DB_USER, DB_PASSWORD, DB_DATABASE, DB_HOST = "localhost" } = process.env;
@@ -13,7 +13,7 @@ export const AppDataSource = new DataSource({
   database: DB_DATABASE,
   synchronize: true,
   logging: false,
-  entities: [User, Friendship, Post, PostMedia, UserTOTP, RefreshToken],
+  entities: [User, Friendship, Post, PostMedia, UserTOTP, RefreshToken, Comment],
   subscribers: [],
   migrations: [],
 });
