@@ -14,7 +14,9 @@ const { WEB_DOMAIN, AWS_S3_IMAGE_BUCKET } = process.env;
 /**
  * Filter posts by search query
  */
-const queryPostsController = async (req: Request, res: Response) => {};
+const queryPostsController = async (req: Request, res: Response) => {
+  return res.status(501).send("Feature not yet available");
+};
 
 /**
  * Create a post from the request body
@@ -83,12 +85,34 @@ const createPostController = async (
 /**
  * Get a post by ID
  */
-const getPostController = async (req: Request, res: Response) => {};
+const getPostController = async (
+  req: ValidatedRequest<typeof postRequestSchemas.getPostSchema>,
+  res: Response,
+  next: NextFunction
+) => {
+  const { postId } = req.params;
+
+  let post: Post | null = null;
+  try {
+    post = await Post.findOne({ where: { id: postId } });
+  } catch (err) {
+    console.error(err);
+    return next(new APIErrors.APIServerError("Failed to fetch post"));
+  }
+
+  if (!post) return next(new APIErrors.APINotFoundError("Post not found"));
+
+  return res.json(post);
+};
 
 /**
  * Delete a post by ID
  */
-const deletePostController = async (req: Request, res: Response) => {};
+const deletePostController = async (
+  req: ValidatedRequest<typeof postRequestSchemas.getPostSchema>,
+  res: Response,
+  next: NextFunction
+) => {};
 
 /**
  * Edit a post by ID based off the request body

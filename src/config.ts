@@ -2,7 +2,7 @@ import bytes from "bytes";
 import parseDuration from "parse-duration";
 import { argon2id } from "argon2";
 
-const { NODE_ENV, SEND_EMAILS_IN_DEV } = process.env;
+const { NODE_ENV = "PRODUCTION", SEND_EMAILS_IN_DEV } = process.env;
 
 const isDevelopmentEnv = NODE_ENV.toUpperCase() === "DEVELOPMENT";
 const sendEmailsInDev = SEND_EMAILS_IN_DEV === "true";
@@ -57,5 +57,10 @@ export const ACCESS_TOKEN_CONSTANTS = {
 export const TOTP_CONSTANTS = {
   SERVICE: "Kakapo",
 };
+
+export const DEPLOYMENT_CONSTANTS = {
+  REAL_IP_HEADER: "CF-Connecting-IP",
+  COUNTRY_HEADER: "CF-IPCountry",
+} as Record<string, string | undefined>;
 
 export { isDevelopmentEnv };

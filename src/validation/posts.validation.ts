@@ -17,4 +17,10 @@ const createPostSchema = z.object({
   }),
 });
 
-export { createPostSchema };
+const getPostSchema = z.object({
+  params: z.object({
+    postId: z.string(),
+  }),
+});
+
+export { createPostSchema, getPostSchema };

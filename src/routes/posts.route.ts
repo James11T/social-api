@@ -10,7 +10,7 @@ import {
 import { POST_CONSTANTS } from "../config";
 import { protect } from "../middleware/auth.middleware";
 import { validate } from "../middleware/validation.middleware";
-import { createPostSchema } from "../validation/posts.validation";
+import { createPostSchema, getPostSchema } from "../validation/posts.validation";
 
 const postsRouter = Router();
 
@@ -28,7 +28,7 @@ postsRouter.post(
   createPostController
 );
 
-postsRouter.get("/:postId", getPostController);
+postsRouter.get("/:postId", validate(getPostSchema), getPostController);
 postsRouter.delete("/:postId", deletePostController);
 postsRouter.patch("/:postId", editPostController);
 

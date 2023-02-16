@@ -3,7 +3,7 @@ import { Ok, Err } from "ts-results";
 import { countryCodeEmoji } from "country-code-emoji";
 import type { Result } from "ts-results";
 
-const FAIL_COUNTRY_CODE = "ZZ";
+const FAIL_COUNTRY_CODE = "XX";
 
 const IPToCountry = (ip: string) => {
   const geoData = geoip.lookup(ip);

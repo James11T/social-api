@@ -5,7 +5,7 @@
   "type": "commonjs",
   "main": "dist/index.js",
   "scripts": {
-    "serve": "serve dist/index.js",
+    "serve": "node dist/index.js",
     "start": "ts-node dist/index.js",
     "dev": "cross-env NODE_ENV=development TS_NODE_FILES=true TS_NODE_TRANSPILE_ONLY=true nodemon src/index.ts",
     "build": "tsc",
@@ -41,7 +41,6 @@
     "parse-duration": "^1.0.2",
     "qrcode": "^1.5.1",
     "reflect-metadata": "^0.1.13",
-    "serve": "^14.1.2",
     "ts-results": "^3.3.0",
     "typeorm": "^0.3.11",
     "uuid": "^9.0.0",
